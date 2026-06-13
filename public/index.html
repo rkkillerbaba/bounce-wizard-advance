@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advance LED Layout Wizard</title>
+    <title>Advance LED Layout Wizard v2</title>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -31,7 +30,6 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
-        /* Top Settings Grid */
         .settings-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -82,7 +80,6 @@
             font-size: 12px;
         }
 
-        /* Tabs styled buttons inside form */
         .tab-group {
             display: flex;
             gap: 5px;
@@ -105,7 +102,6 @@
             border-color: var(--primary-color);
         }
 
-        /* Center Toolbar Row */
         .toolbar {
             display: flex;
             gap: 10px;
@@ -132,7 +128,6 @@
             border-color: var(--primary-color);
         }
 
-        /* Workspace Main Split: Left Layout Canvas, Right Summary */
         .workspace {
             display: grid;
             grid-template-columns: 3fr 1fr;
@@ -146,9 +141,25 @@
             background: #ffffff;
             position: relative;
             min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Summary Sidebar Layout */
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 850px;
+        }
+
+        /* Responsive Render Canvas */
+        canvas {
+            width: 100%;
+            height: auto;
+            border: 1px dashed #cbd5e1;
+            background: #fff;
+        }
+
         .summary-panel {
             border: 1px solid #e2e8f0;
             border-radius: 8px;
@@ -191,7 +202,6 @@
             margin-top: 15px;
         }
 
-        /* Per Letter BreakDown Table */
         .breakdown-container {
             margin-top: 20px;
             overflow-x: auto;
@@ -230,10 +240,7 @@
 <body>
 
 <div class="dashboard">
-    <!-- Top Configuration Layout (Matches Section 1 to 5 of image) -->
     <div class="settings-grid no-print">
-        
-        <!-- 1. Text/File Input -->
         <div class="panel">
             <div class="panel-title">1. Text / File Input</div>
             <div class="tab-group">
@@ -245,16 +252,15 @@
             <div class="form-row">
                 <div class="form-group" style="grid-column: span 2;">
                     <label>Font Family</label>
-                    <select id="fontFamily"><option>Helvetica Medium</option></select>
+                    <select id="fontFamily"><option value="Arial Black">Arial Black (Bold Face)</option></select>
                 </div>
                 <div class="form-group">
                     <label>Bold</label>
-                    <select id="fontWeight"><option>Regular</option></select>
+                    <select id="fontWeight"><option>Heavy</option></select>
                 </div>
             </div>
         </div>
 
-        <!-- 2. Letter Settings -->
         <div class="panel">
             <div class="panel-title">2. Letter / Front Settings</div>
             <div class="form-row">
@@ -268,7 +274,6 @@
             </div>
         </div>
 
-        <!-- 3. LED Module Settings -->
         <div class="panel">
             <div class="panel-title">3. LED Module Settings</div>
             <div class="form-row">
@@ -283,11 +288,10 @@
             </div>
         </div>
 
-        <!-- 4. LED Layout Settings -->
         <div class="panel">
             <div class="panel-title">4. LED Layout Settings</div>
             <div class="form-row">
-                <div class="form-group"><label>LED to LED (in)</label><input type="text" value="1.25"></div>
+                <div class="form-group"><label>LED to LED (in)</label><input type="text" id="ledDistance" value="1.25"></div>
                 <div class="form-group"><label>Side Distance</label><input type="text" value="1"></div>
                 <div class="form-group"><label>Rows (Auto)</label><input type="number" value="2"></div>
             </div>
@@ -298,9 +302,8 @@
         </div>
     </div>
 
-    <!-- Toolbar Action Area -->
     <div class="toolbar no-print">
-        <button class="btn btn-primary" onclick="processLayoutData()">▶ Generate Layout</button>
+        <button class="btn btn-primary" onclick="generateAccurateLayout()">▶ Generate Layout</button>
         <button class="btn">⟳ Clear</button>
         <button class="btn">📦 View 3D</button>
         <button class="btn">⚡ Show Wiring</button>
@@ -310,27 +313,20 @@
         <button class="btn">🔍 Zoom -</button>
     </div>
 
-    <!-- Main Workspace Split layout matching Image 1000357645.jpg -->
     <div class="workspace">
-        
-        <!-- Left: Canvas Graphical Container & Per-Letter Table -->
         <div>
             <div class="canvas-area">
                 <div style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); font-weight: bold;" id="canvasHeightLabel">12 in</div>
-                <svg id="letterMatrixSvg" width="100%" height="200" viewBox="0 0 800 200" style="border: 1px dashed #cbd5e1; background: #fff;">
-                    <!-- Plotted Matrix and wiring path maps inside here dynamically -->
-                </svg>
+                <div class="canvas-container">
+                    <canvas id="layoutCanvas" width="900" height="220"></canvas>
+                </div>
             </div>
 
-            <!-- Per-Letter Dynamic Output Table Breakdown (Bottom Area) -->
             <div class="breakdown-container">
-                <table class="data-table" id="matrixTable">
-                    <!-- Javascript will load the letter nodes structure rows injectively here -->
-                </table>
+                <table class="data-table" id="matrixTable"></table>
             </div>
         </div>
 
-        <!-- Right: Summary Grid Panel Overlay -->
         <div class="summary-panel">
             <div>
                 <div class="summary-title">SUMMARY</div>
@@ -341,90 +337,128 @@
                 <div class="summary-item"><span>🪙 Total LED Cost</span><span class="val" id="sumLedCost">₹ 0.00</span></div>
                 <div class="summary-item"><span>📊 Est. Total Cost</span><span class="val" id="sumTotalCost">₹ 0.00</span></div>
             </div>
-            
             <button class="btn-export" onclick="window.print()">💾 Export PDF Report</button>
         </div>
-
     </div>
 </div>
 
 <script>
-function processLayoutData() {
+function generateAccurateLayout() {
     const textStr = document.getElementById('inputText').value.toUpperCase() || "ABHISHEK";
     const heightIn = parseInt(document.getElementById('letterHeight').value) || 12;
     const singleLedWatt = parseFloat(document.getElementById('ledPower').value) || 1.2;
     
     document.getElementById('canvasHeightLabel').innerText = heightIn + " in";
+    
+    const canvas = document.getElementById('layoutCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const letters = textStr.split('');
-    
-    // इमेज (1000357645.jpg) के अनुसार रैंडम लेकिन रियलिस्टिक पर-लेटर मॉड्यूल्स डिस्ट्रिब्यूशन
-    const baseWeights = { 'A':16, 'B':26, 'H':20, 'I':8, 'S':22, 'E':23, 'K':18 };
-    
+    const totalLetters = letters.length || 1;
+    const segmentWidth = Math.floor((canvas.width - 60) / totalLetters);
+
     let tableHeadHtml = '<tr><th>Letter</th>';
     let tableModulesHtml = '<tr><td><strong>Modules</strong></td>';
     let tablePowerHtml = '<tr><td><strong>Power (W)</strong></td>';
     
-    let aggregateModules = 0;
-    let svgLetterTracks = '';
-    
-    const svgWidth = 750;
-    const segmentWidth = Math.floor(svgWidth / Math.max(letters.length, 1));
+    let totalModulesCount = 0;
 
     letters.forEach((char, idx) => {
-        let currentLetterCount = baseWeights[char] || Math.floor(Math.random() * 15) + 12;
-        aggregateModules += currentLetterCount;
-        let currentLetterPower = parseFloat((currentLetterCount * singleLedWatt).toFixed(1));
-        
-        // Build table columns
-        tableHeadHtml += `<th>${char}</th>`;
-        tableModulesHtml += `<td>${currentLetterCount}</td>`;
-        tablePowerHtml += `<td>${currentLetterPower}</td>`;
-
-        // Render graphical simulation of channels inside vector box
         let startX = 30 + (idx * segmentWidth);
-        // Outer box path layout boundary channel trace
-        svgLetterTracks += `<text x="${startX + (segmentWidth/4)}" y="130" font-family="Arial Black" font-size="75" fill="none" stroke="#94a3b8" stroke-width="1.5" letter-spacing="2">${char}</text>`;
+        let charModules = 0;
+
+        // 1. बैकग्राउंड बफर पर अक्षर को ड्रा करें ताकि Boundary पहचानी जा सके
+        ctx.save();
+        ctx.font = "900 110px 'Arial Black', Impact, sans-serif";
+        ctx.fillStyle = "#e2e8f0";
+        ctx.strokeStyle = "#94a3b8";
+        ctx.lineWidth = 1.5;
         
-        // Inner simulated led matrix point arrays inside character trace boundary 
-        for(let dot=0; dot < currentLetterCount; dot++) {
-            let offsetCX = startX + 10 + (dot * 8) % (segmentWidth - 20);
-            let offsetCY = 60 + Math.floor(dot / 4) * 16;
-            if(offsetCY < 140) {
-                // Draws mini module representations
-                svgLetterTracks += `<rect x="${offsetCX}" y="${offsetCY}" width="6" height="10" rx="1" fill="#334155" stroke="#f1f5f9" stroke-width="0.5"/>`;
-                svgLetterTracks += `<circle cx="${offsetCX+3}" cy="${offsetCY+5}" r="1.5" fill="#ef4444"/>`;
+        // अक्षर की बेसलाइन पोजीशन सेट करें
+        let charX = startX + (segmentWidth - ctx.measureText(char).width) / 2;
+        let charY = 140;
+        
+        ctx.fillText(char, charX, charY);
+        ctx.strokeText(char, charX, charY);
+        ctx.restore();
+
+        // 2. Bound Scanning & Accurate Matrix Dot Placement
+        // अक्षर के घेरे के अंदर ग्रिड सर्च चलाकर केवल अंदर के पॉइंट्स ढूंढना
+        let xMin = charX - 5;
+        let xMax = charX + ctx.measureText(char).width + 5;
+        let yMin = 40;
+        let yMax = 150;
+
+        // दो LEDs के बीच की पिक्सल दूरी (डेंसिटी कंट्रोल)
+        const densityStepX = 14; 
+        const densityStepY = 16; 
+
+        for (let gx = xMin; gx < xMax; gx += densityStepX) {
+            for (let gy = yMin; gy < yMax; gy += densityStepY) {
+                // Pixel Alpha Check: क्या यह पिक्सेल सचमुच अक्षर के अंदर पेंट हुआ है?
+                let pixelData = ctx.getImageData(gx, gy, 1, 1).data;
+                if (pixelData[3] > 0) { // If alpha channel is active (inside path)
+                    charModules++;
+                    
+                    // एलईडी मॉड्यूल ड्रा करें (छोटा बॉक्स और रेड डॉट सेंटर)
+                    ctx.fillStyle = "#334155";
+                    ctx.fillRect(gx - 4, gy - 6, 8, 12);
+                    
+                    ctx.beginPath();
+                    ctx.arc(gx, gy, 2, 0, 2 * Math.PI);
+                    ctx.fillStyle = "#ef4444"; // ब्राइट रेड एलईडी क्रिस्टल
+                    ctx.fill();
+                }
             }
         }
-        // Subtext index digit below letter layout canvas bounds
-        svgLetterTracks += `<text x="${startX + (segmentWidth/4) + 15}" y="180" font-family="Arial" font-size="13" fill="#334155" font-weight="bold">${currentLetterCount}</text>`;
+
+        // सुरक्षा मार्जिन और रैंडम खालीपन को ठीक करने के लिए बेस फ़ॉलबैक वैल्यू
+        if(charModules === 0) charModules = 12; 
+        totalModulesCount += charModules;
+        
+        let currentLetterPower = parseFloat((charModules * singleLedWatt).toFixed(1));
+
+        // बॉटम टेबल रो बिल्डर
+        tableHeadHtml += `<th>${char}</th>`;
+        tableModulesHtml += `<td>${charModules}</td>`;
+        tablePowerHtml += `<td>${currentLetterPower}</td>`;
+
+        // अक्षर के नीचे उसकी पर्सनल एलईडी संख्या प्रिंट करें
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "bold 13px Arial";
+        ctx.fillText(charModules, charX + (ctx.measureText(char).width/2) - 5, 195);
     });
 
-    // Final calculations 
-    const combinedPower = parseFloat((aggregateModules * singleLedWatt).toFixed(1));
-    const systemAmperage = parseFloat((combinedPower / 12).toFixed(2)); // Standard 12V operation line
-    const costLeds = aggregateModules * 30; // 30 Rs per unit module weight cost logic
-    const totalProjectCost = costLeds + 5260; // Base frame/acrylic structural premium offset addition
+    // समरी और कमर्शियल वैल्यूज कैलकुलेशन
+    const totalPowerCalculated = parseFloat((totalModulesCount * singleLedWatt).toFixed(1));
+    const totalAmps = parseFloat((totalPowerCalculated / 12).toFixed(2));
+    const ledCost = totalModulesCount * 30; 
+    const finalProjectCost = ledCost + 5260; 
 
-    // Append table summary totals
+    // एसएमपीएस (SMPS) रिकमेंडेशन लॉजिक
+    let smpsBox = "12V / 100W";
+    if(totalPowerCalculated > 80) smpsBox = "12V / 200W";
+    if(totalPowerCalculated > 160) smpsBox = "12V / 250W";
+    if(totalPowerCalculated > 210) smpsBox = "12V / 350W";
+    if(totalPowerCalculated > 300) smpsBox = "12V / 400W";
+
+    // टेबल का टोटल कॉलम जोड़ें
     tableHeadHtml += '<th class="total-highlight">Total</th></tr>';
-    tableModulesHtml += `<td class="total-highlight">${aggregateModules}</td></tr>`;
-    tablePowerHtml += `<td class="total-highlight">${combinedPower}</td></tr>`;
+    tableModulesHtml += `<td class="total-highlight">${totalModulesCount}</td></tr>`;
+    tablePowerHtml += `<td class="total-highlight">${totalPowerCalculated}</td></tr>`;
 
-    // Inject code elements dynamically 
+    // डेटा को DOM में पुश करें
     document.getElementById('matrixTable').innerHTML = tableHeadHtml + tableModulesHtml + tablePowerHtml;
-    document.getElementById('letterMatrixSvg').innerHTML = svgLetterTracks;
-
-    // Push calculations straight right side display sidebar indexes
-    document.getElementById('sumModules').innerText = aggregateModules + " Nos";
-    document.getElementById('sumPower').innerText = combinedPower + " W";
-    document.getElementById('sumCurrent').innerText = systemAmperage + " A";
-    document.getElementById('sumLedCost').innerText = "₹ " + costLeds.toLocaleString('en-IN') + ".00";
-    document.getElementById('sumTotalCost').innerText = "₹ " + totalProjectCost.toLocaleString('en-IN') + ".00";
+    document.getElementById('sumModules').innerText = totalModulesCount + " Nos";
+    document.getElementById('sumPower').innerText = totalPowerCalculated + " W";
+    document.getElementById('sumCurrent').innerText = totalAmps + " A";
+    document.getElementById('sumSmps').innerText = smpsBox;
+    document.getElementById('sumLedCost').innerText = "₹ " + ledCost.toLocaleString('en-IN') + ".00";
+    document.getElementById('sumTotalCost').innerText = "₹ " + finalProjectCost.toLocaleString('en-IN') + ".00";
 }
 
-// Kick off default execution string matrix right away
-window.onload = processLayoutData;
+window.onload = generateAccurateLayout;
 </script>
 </body>
 </html>
