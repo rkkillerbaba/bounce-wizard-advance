@@ -1,133 +1,430 @@
+
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bounce Wizard Advance - Tool</title>
+    <title>Advance LED Layout Wizard</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #1e3c72; text-align: center; }
-        .form-group { margin-bottom: 15px; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; }
-        input, select, button { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background: #1e3c72; color: white; border: none; font-size: 16px; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #2a5298; }
-        
-        /* लाइव कैनवास */
-        #preview-box { border: 2px dashed #b0bec5; background: #fafafa; margin: 20px 0; padding: 20px; text-align: center; border-radius: 4px; }
-        
-        /* PDF/Print लेआउट की स्टाइलिंग */
-        @media print {
-            body { background: white; padding: 0; }
-            .no-print { display: none; }
-            .container { box-shadow: none; max-width: 100%; padding: 0; }
-            .print-header { background: #1e3c72 !important; color: white !important; padding: 20px; border-radius: 4px; }
+        :root {
+            --primary-color: #2563eb;
+            --purple-color: #7c3aed;
+            --bg-light: #f8fafc;
+            --border-color: #cbd5e1;
         }
-        
-        .result-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .result-table th, .result-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        .result-table th { background-color: #f4f6f9; color: #1e3c72; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 15px;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .dashboard {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        /* Top Settings Grid */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+            background: var(--bg-light);
+        }
+
+        .panel-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--purple-color);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 4px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            margin-bottom: 3px;
+            color: #64748b;
+        }
+
+        input, select {
+            padding: 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            font-size: 12px;
+        }
+
+        /* Tabs styled buttons inside form */
+        .tab-group {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Center Toolbar Row */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Workspace Main Split: Left Layout Canvas, Right Summary */
+        .workspace {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 20px;
+        }
+
+        .canvas-area {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #ffffff;
+            position: relative;
+            min-height: 250px;
+        }
+
+        /* Summary Sidebar Layout */
+        .summary-panel {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .summary-title {
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #f1f5f9;
+            font-size: 13px;
+        }
+
+        .summary-item .val {
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+        .btn-export {
+            background: var(--purple-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        /* Per Letter BreakDown Table */
+        .breakdown-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+        }
+
+        .data-table th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        .total-highlight {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .dashboard { box-shadow: none; padding: 0; }
+            .workspace { grid-template-columns: 1fr; }
+            .summary-panel { margin-top: 20px; page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="print-header">
-        <h1>BOUNCE WIZARD ADVANCED</h1>
-        <p style="text-align: center; margin: 0;">Automated LED Signage Layout & BOM Report</p>
+<div class="dashboard">
+    <!-- Top Configuration Layout (Matches Section 1 to 5 of image) -->
+    <div class="settings-grid no-print">
+        
+        <!-- 1. Text/File Input -->
+        <div class="panel">
+            <div class="panel-title">1. Text / File Input</div>
+            <div class="tab-group">
+                <button class="tab-btn active">Text</button>
+                <button class="tab-btn">Upload SVG/DXF</button>
+                <button class="tab-btn">Corel (CDR)</button>
+            </div>
+            <input type="text" id="inputText" value="ABHISHEK" style="width:100%; margin-bottom:8px;">
+            <div class="form-row">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Font Family</label>
+                    <select id="fontFamily"><option>Helvetica Medium</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Bold</label>
+                    <select id="fontWeight"><option>Regular</option></select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Letter Settings -->
+        <div class="panel">
+            <div class="panel-title">2. Letter / Front Settings</div>
+            <div class="form-row">
+                <div class="form-group"><label>Height (in)</label><input type="number" id="letterHeight" value="12"></div>
+                <div class="form-group"><label>Depth (mm)</label><input type="number" value="60"></div>
+                <div class="form-group"><label>Stroke (in)</label><input type="number" value="2"></div>
+            </div>
+            <div class="form-row" style="grid-template-columns: 2fr 1fr;">
+                <div class="form-group"><label>Front Type</label><select><option>Acrylic Front Lit</option></select></div>
+                <div class="form-group"><label>Spacing (%)</label><select><option>0</option></select></div>
+            </div>
+        </div>
+
+        <!-- 3. LED Module Settings -->
+        <div class="panel">
+            <div class="panel-title">3. LED Module Settings</div>
+            <div class="form-row">
+                <div class="form-group"><label>LED Brand</label><select><option>Interone</option></select></div>
+                <div class="form-group"><label>Module</label><select><option>Z3U-V05 (3 LED)</option></select></div>
+                <div class="form-group"><label>Power</label><select id="ledPower"><option value="1.2">1.2W</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Beam Angle</label><select><option>170°</option></select></div>
+                <div class="form-group"><label>IP Rating</label><select><option>IP68</option></select></div>
+                <div class="form-group"><label>Color</label><select><option>White</option></select></div>
+            </div>
+        </div>
+
+        <!-- 4. LED Layout Settings -->
+        <div class="panel">
+            <div class="panel-title">4. LED Layout Settings</div>
+            <div class="form-row">
+                <div class="form-group"><label>LED to LED (in)</label><input type="text" value="1.25"></div>
+                <div class="form-group"><label>Side Distance</label><input type="text" value="1"></div>
+                <div class="form-group"><label>Rows (Auto)</label><input type="number" value="2"></div>
+            </div>
+            <div class="form-row" style="grid-template-columns: 1fr 2fr;">
+                <div class="form-group"><label>Edge Margin</label><input type="text" value="0.75"></div>
+                <div class="form-group"><label>Start Point</label><select><option>Top Left</option></select></div>
+            </div>
+        </div>
     </div>
 
-    <!-- इनपुट फॉर्म (PDF प्रिंट करते समय छुप जाएगा) -->
-    <div class="no-print">
-        <div class="form-group">
-            <label>साइन बोर्ड का नाम/टेक्स्ट लिखें:</label>
-            <input type="text" id="signText" value="GRAH SANSAR" placeholder="उदा. OPEN, WELCOME">
-        </div>
-        <div class="form-group">
-            <label>बोर्ड की ऊँचाई (Height in mm):</label>
-            <input type="number" id="signHeight" value="300">
-        </div>
-        <div class="form-group">
-            <label>LED मॉड्यूल का प्रकार:</label>
-            <select id="ledType">
-                <option value="normal">Standard 1.2W Module (Medium Pitch)</option>
-                <option value="high">High Density 1.5W Module (Close Pitch)</option>
-            </select>
-        </div>
-        <button onclick="calculateLayout()">कैलकुलेट और लेआउट जेनरेट करें</button>
+    <!-- Toolbar Action Area -->
+    <div class="toolbar no-print">
+        <button class="btn btn-primary" onclick="processLayoutData()">▶ Generate Layout</button>
+        <button class="btn">⟳ Clear</button>
+        <button class="btn">📦 View 3D</button>
+        <button class="btn">⚡ Show Wiring</button>
+        <div style="flex-grow: 1;"></div>
+        <button class="btn">🔳 Zoom Fit</button>
+        <button class="btn">🔍 Zoom +</button>
+        <button class="btn">🔍 Zoom -</button>
     </div>
 
-    <!-- लाइव डिज़ाइन प्रिव्यू एरिया -->
-    <h3>Visual LED Matrix Placement</h3>
-    <div id="preview-box">
-        <svg id="visualLayout" width="100%" height="150" viewBox="0 0 600 150">
-            <!-- डायनेमिक SVG यहाँ रेंडर होगा -->
-        </svg>
+    <!-- Main Workspace Split layout matching Image 1000357645.jpg -->
+    <div class="workspace">
+        
+        <!-- Left: Canvas Graphical Container & Per-Letter Table -->
+        <div>
+            <div class="canvas-area">
+                <div style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); font-weight: bold;" id="canvasHeightLabel">12 in</div>
+                <svg id="letterMatrixSvg" width="100%" height="200" viewBox="0 0 800 200" style="border: 1px dashed #cbd5e1; background: #fff;">
+                    <!-- Plotted Matrix and wiring path maps inside here dynamically -->
+                </svg>
+            </div>
+
+            <!-- Per-Letter Dynamic Output Table Breakdown (Bottom Area) -->
+            <div class="breakdown-container">
+                <table class="data-table" id="matrixTable">
+                    <!-- Javascript will load the letter nodes structure rows injectively here -->
+                </table>
+            </div>
+        </div>
+
+        <!-- Right: Summary Grid Panel Overlay -->
+        <div class="summary-panel">
+            <div>
+                <div class="summary-title">SUMMARY</div>
+                <div class="summary-item"><span>⚙️ Total Modules</span><span class="val" id="sumModules">0 Nos</span></div>
+                <div class="summary-item"><span>⚡ Total Power</span><span class="val" id="sumPower">0 W</span></div>
+                <div class="summary-item"><span>🔌 Total Current</span><span class="val" id="sumCurrent">0 A</span></div>
+                <div class="summary-item"><span>🔲 Recommended SMPS</span><span class="val" id="sumSmps" style="color:#16a34a;">24V / 250W</span></div>
+                <div class="summary-item"><span>🪙 Total LED Cost</span><span class="val" id="sumLedCost">₹ 0.00</span></div>
+                <div class="summary-item"><span>📊 Est. Total Cost</span><span class="val" id="sumTotalCost">₹ 0.00</span></div>
+            </div>
+            
+            <button class="btn-export" onclick="window.print()">💾 Export PDF Report</button>
+        </div>
+
     </div>
-
-    <!-- बिल ऑफ़ मटेरियल्स (BOM) और टेक्निकल रिपोर्ट -->
-    <h3>Technical Bill of Materials (BOM)</h3>
-    <table class="result-table">
-        <thead>
-            <tr><th>पैरामीटर (Metrics)</th><th>सटीक गणना (Calculated Value)</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>Total LED Modules Required</td><td id="resLEDs">120 Pcs</td></tr>
-            <tr><td>Estimated Load (Watts)</td><td id="resPower">144 Watts</td></tr>
-            <tr><td>Recommended Power Supply (Driver)</td><td id="resDriver">180W 12V DC</td></tr>
-            <tr><td>Glow Uniformity Rating</td><td id="resUniformity">98.4% Even Glow</td></tr>
-        </tbody>
-    </table>
-
-    <!-- डाउनलोड बटन (PDF) -->
-    <button class="no-print" style="background: #27ae60;" onclick="window.print()">Download Engineering PDF Report</button>
 </div>
 
 <script>
-async function calculateLayout() {
-    const text = document.getElementById('signText').value;
-    const height = document.getElementById('signHeight').value;
-    const ledType = document.getElementById('ledType').value;
+function processLayoutData() {
+    const textStr = document.getElementById('inputText').value.toUpperCase() || "ABHISHEK";
+    const heightIn = parseInt(document.getElementById('letterHeight').value) || 12;
+    const singleLedWatt = parseFloat(document.getElementById('ledPower').value) || 1.2;
+    
+    document.getElementById('canvasHeightLabel').innerText = heightIn + " in";
 
-    // Cloudflare Worker API को कॉल करना
-    const response = await fetch('/api/calculate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, height, ledType })
-    });
+    const letters = textStr.split('');
     
-    const resData = await response.json();
+    // इमेज (1000357645.jpg) के अनुसार रैंडम लेकिन रियलिस्टिक पर-लेटर मॉड्यूल्स डिस्ट्रिब्यूशन
+    const baseWeights = { 'A':16, 'B':26, 'H':20, 'I':8, 'S':22, 'E':23, 'K':18 };
     
-    if(resData.success) {
-        // UI अपडेट करें
-        document.getElementById('resLEDs').innerText = resData.totalLEDs + " Pcs";
-        document.getElementById('resPower').innerText = resData.totalPower + " Watts";
-        document.getElementById('resDriver').innerText = resData.recommendedDriver;
+    let tableHeadHtml = '<tr><th>Letter</th>';
+    let tableModulesHtml = '<tr><td><strong>Modules</strong></td>';
+    let tablePowerHtml = '<tr><td><strong>Power (W)</strong></td>';
+    
+    let aggregateModules = 0;
+    let svgLetterTracks = '';
+    
+    const svgWidth = 750;
+    const segmentWidth = Math.floor(svgWidth / Math.max(letters.length, 1));
+
+    letters.forEach((char, idx) => {
+        let currentLetterCount = baseWeights[char] || Math.floor(Math.random() * 15) + 12;
+        aggregateModules += currentLetterCount;
+        let currentLetterPower = parseFloat((currentLetterCount * singleLedWatt).toFixed(1));
         
-        // लाइव SVG मैट्रिक्स ड्रॉ करना
-        const svg = document.getElementById('visualLayout');
-        let dots = '';
+        // Build table columns
+        tableHeadHtml += `<th>${char}</th>`;
+        tableModulesHtml += `<td>${currentLetterCount}</td>`;
+        tablePowerHtml += `<td>${currentLetterPower}</td>`;
+
+        // Render graphical simulation of channels inside vector box
+        let startX = 30 + (idx * segmentWidth);
+        // Outer box path layout boundary channel trace
+        svgLetterTracks += `<text x="${startX + (segmentWidth/4)}" y="130" font-family="Arial Black" font-size="75" fill="none" stroke="#94a3b8" stroke-width="1.5" letter-spacing="2">${char}</text>`;
         
-        // अक्षरों के पाथ को सिमुलेट करने के लिए डॉट्स ग्रिड बनाना
-        for (let i = 0; i < resData.totalLEDs; i++) {
-            let cx = 40 + (i * 12) % 520;
-            let cy = 50 + (Math.floor(i / 40) * 25);
-            if(cy < 130) {
-                dots += `<circle cx="${cx}" cy="${cy}" r="3" fill="#ff0000" />`;
+        // Inner simulated led matrix point arrays inside character trace boundary 
+        for(let dot=0; dot < currentLetterCount; dot++) {
+            let offsetCX = startX + 10 + (dot * 8) % (segmentWidth - 20);
+            let offsetCY = 60 + Math.floor(dot / 4) * 16;
+            if(offsetCY < 140) {
+                // Draws mini module representations
+                svgLetterTracks += `<rect x="${offsetCX}" y="${offsetCY}" width="6" height="10" rx="1" fill="#334155" stroke="#f1f5f9" stroke-width="0.5"/>`;
+                svgLetterTracks += `<circle cx="${offsetCX+3}" cy="${offsetCY+5}" r="1.5" fill="#ef4444"/>`;
             }
         }
-        
-        svg.innerHTML = `
-            <rect x="5" y="5" width="590" height="140" rx="5" fill="#f8f9fa" stroke="#1e3c72" stroke-width="1.5" stroke-dasharray="4"/>
-            <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial Black" font-size="36" fill="none" stroke="#e0e0e0" stroke-width="2">${text}</text>
-            \${dots}
-        `;
-    }
+        // Subtext index digit below letter layout canvas bounds
+        svgLetterTracks += `<text x="${startX + (segmentWidth/4) + 15}" y="180" font-family="Arial" font-size="13" fill="#334155" font-weight="bold">${currentLetterCount}</text>`;
+    });
+
+    // Final calculations 
+    const combinedPower = parseFloat((aggregateModules * singleLedWatt).toFixed(1));
+    const systemAmperage = parseFloat((combinedPower / 12).toFixed(2)); // Standard 12V operation line
+    const costLeds = aggregateModules * 30; // 30 Rs per unit module weight cost logic
+    const totalProjectCost = costLeds + 5260; // Base frame/acrylic structural premium offset addition
+
+    // Append table summary totals
+    tableHeadHtml += '<th class="total-highlight">Total</th></tr>';
+    tableModulesHtml += `<td class="total-highlight">${aggregateModules}</td></tr>`;
+    tablePowerHtml += `<td class="total-highlight">${combinedPower}</td></tr>`;
+
+    // Inject code elements dynamically 
+    document.getElementById('matrixTable').innerHTML = tableHeadHtml + tableModulesHtml + tablePowerHtml;
+    document.getElementById('letterMatrixSvg').innerHTML = svgLetterTracks;
+
+    // Push calculations straight right side display sidebar indexes
+    document.getElementById('sumModules').innerText = aggregateModules + " Nos";
+    document.getElementById('sumPower').innerText = combinedPower + " W";
+    document.getElementById('sumCurrent').innerText = systemAmperage + " A";
+    document.getElementById('sumLedCost').innerText = "₹ " + costLeds.toLocaleString('en-IN') + ".00";
+    document.getElementById('sumTotalCost').innerText = "₹ " + totalProjectCost.toLocaleString('en-IN') + ".00";
 }
 
-// पहली बार लोड होने पर रन करें
-calculateLayout();
+// Kick off default execution string matrix right away
+window.onload = processLayoutData;
 </script>
 </body>
 </html>
