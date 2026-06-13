@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bounce Wizard Advance - Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #1e3c72; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; }
+        input, select, button { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #1e3c72; color: white; border: none; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #2a5298; }
+        
+        /* लाइव कैनवास */
+        #preview-box { border: 2px dashed #b0bec5; background: #fafafa; margin: 20px 0; padding: 20px; text-align: center; border-radius: 4px; }
+        
+        /* PDF/Print लेआउट की स्टाइलिंग */
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print { display: none; }
+            .container { box-shadow: none; max-width: 100%; padding: 0; }
+            .print-header { background: #1e3c72 !important; color: white !important; padding: 20px; border-radius: 4px; }
+        }
+        
+        .result-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .result-table th, .result-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        .result-table th { background-color: #f4f6f9; color: #1e3c72; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="print-header">
+        <h1>BOUNCE WIZARD ADVANCED</h1>
+        <p style="text-align: center; margin: 0;">Automated LED Signage Layout & BOM Report</p>
+    </div>
+
+    <!-- इनपुट फॉर्म (PDF प्रिंट करते समय छुप जाएगा) -->
+    <div class="no-print">
+        <div class="form-group">
+            <label>साइन बोर्ड का नाम/टेक्स्ट लिखें:</label>
+            <input type="text" id="signText" value="GRAH SANSAR" placeholder="उदा. OPEN, WELCOME">
+        </div>
+        <div class="form-group">
+            <label>बोर्ड की ऊँचाई (Height in mm):</label>
+            <input type="number" id="signHeight" value="300">
+        </div>
+        <div class="form-group">
+            <label>LED मॉड्यूल का प्रकार:</label>
+            <select id="ledType">
+                <option value="normal">Standard 1.2W Module (Medium Pitch)</option>
+                <option value="high">High Density 1.5W Module (Close Pitch)</option>
+            </select>
+        </div>
+        <button onclick="calculateLayout()">कैलकुलेट और लेआउट जेनरेट करें</button>
+    </div>
+
+    <!-- लाइव डिज़ाइन प्रिव्यू एरिया -->
+    <h3>Visual LED Matrix Placement</h3>
+    <div id="preview-box">
+        <svg id="visualLayout" width="100%" height="150" viewBox="0 0 600 150">
+            <!-- डायनेमिक SVG यहाँ रेंडर होगा -->
+        </svg>
+    </div>
+
+    <!-- बिल ऑफ़ मटेरियल्स (BOM) और टेक्निकल रिपोर्ट -->
+    <h3>Technical Bill of Materials (BOM)</h3>
+    <table class="result-table">
+        <thead>
+            <tr><th>पैरामीटर (Metrics)</th><th>सटीक गणना (Calculated Value)</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Total LED Modules Required</td><td id="resLEDs">120 Pcs</td></tr>
+            <tr><td>Estimated Load (Watts)</td><td id="resPower">144 Watts</td></tr>
+            <tr><td>Recommended Power Supply (Driver)</td><td id="resDriver">180W 12V DC</td></tr>
+            <tr><td>Glow Uniformity Rating</td><td id="resUniformity">98.4% Even Glow</td></tr>
+        </tbody>
+    </table>
+
+    <!-- डाउनलोड बटन (PDF) -->
+    <button class="no-print" style="background: #27ae60;" onclick="window.print()">Download Engineering PDF Report</button>
+</div>
+
+<script>
+async function calculateLayout() {
+    const text = document.getElementById('signText').value;
+    const height = document.getElementById('signHeight').value;
+    const ledType = document.getElementById('ledType').value;
+
+    // Cloudflare Worker API को कॉल करना
+    const response = await fetch('/api/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, height, ledType })
+    });
+    
+    const resData = await response.json();
+    
+    if(resData.success) {
+        // UI अपडेट करें
+        document.getElementById('resLEDs').innerText = resData.totalLEDs + " Pcs";
+        document.getElementById('resPower').innerText = resData.totalPower + " Watts";
+        document.getElementById('resDriver').innerText = resData.recommendedDriver;
+        
+        // लाइव SVG मैट्रिक्स ड्रॉ करना
+        const svg = document.getElementById('visualLayout');
+        let dots = '';
+        
+        // अक्षरों के पाथ को सिमुलेट करने के लिए डॉट्स ग्रिड बनाना
+        for (let i = 0; i < resData.totalLEDs; i++) {
+            let cx = 40 + (i * 12) % 520;
+            let cy = 50 + (Math.floor(i / 40) * 25);
+            if(cy < 130) {
+                dots += `<circle cx="${cx}" cy="${cy}" r="3" fill="#ff0000" />`;
+            }
+        }
+        
+        svg.innerHTML = `
+            <rect x="5" y="5" width="590" height="140" rx="5" fill="#f8f9fa" stroke="#1e3c72" stroke-width="1.5" stroke-dasharray="4"/>
+            <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial Black" font-size="36" fill="none" stroke="#e0e0e0" stroke-width="2">${text}</text>
+            \${dots}
+        `;
+    }
+}
+
+// पहली बार लोड होने पर रन करें
+calculateLayout();
+</script>
+</body>
+</html>
