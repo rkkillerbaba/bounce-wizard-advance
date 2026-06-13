@@ -2,239 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advance LED Layout Wizard v2</title>
+    <title>SaaS LED Layout Wizard Pro</title>
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --purple-color: #7c3aed;
-            --bg-light: #f8fafc;
-            --border-color: #cbd5e1;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f1f5f9;
-            margin: 0;
-            padding: 15px;
-            font-size: 13px;
-            color: #334155;
-        }
-
-        .dashboard {
-            max-width: 1300px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
-
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .panel {
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 12px;
-            background: var(--bg-light);
-        }
-
-        .panel-title {
-            font-size: 11px;
-            font-weight: bold;
-            color: var(--purple-color);
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 4px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-size: 11px;
-            margin-bottom: 3px;
-            color: #64748b;
-        }
-
-        input, select {
-            padding: 6px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background: white;
-            font-size: 12px;
-        }
-
-        .tab-group {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 6px;
-            border: 1px solid var(--border-color);
-            background: white;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 11px;
-        }
-
-        .tab-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .toolbar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-            background: white;
-            cursor: pointer;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .workspace {
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 20px;
-        }
-
-        .canvas-area {
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 20px;
-            background: #ffffff;
-            position: relative;
-            min-height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .canvas-container {
-            position: relative;
-            width: 100%;
-            max-width: 850px;
-        }
-
-        /* Responsive Render Canvas */
-        canvas {
-            width: 100%;
-            height: auto;
-            border: 1px dashed #cbd5e1;
-            background: #fff;
-        }
-
-        .summary-panel {
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 15px;
-            background: #ffffff;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .summary-title {
-            font-weight: bold;
-            color: #1e293b;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed #f1f5f9;
-            font-size: 13px;
-        }
-
-        .summary-item .val {
-            font-weight: bold;
-            color: #0f172a;
-        }
-
-        .btn-export {
-            background: var(--purple-color);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 15px;
-        }
-
-        .breakdown-container {
-            margin-top: 20px;
-            overflow-x: auto;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-        }
-
-        .data-table th, .data-table td {
-            border: 1px solid #e2e8f0;
-            padding: 8px;
-        }
-
-        .data-table th {
-            background: #f8fafc;
-            font-weight: 600;
-        }
-
-        .total-highlight {
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white; padding: 0; }
-            .dashboard { box-shadow: none; padding: 0; }
-            .workspace { grid-template-columns: 1fr; }
-            .summary-panel { margin-top: 20px; page-break-inside: avoid; }
-        }
+        :root { --primary: #2563eb; --purple: #7c3aed; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', sans-serif; background:#f1f5f9; margin:0; padding:15px; font-size:13px; }
+        .dashboard { max-width: 1300px; margin:0 auto; background:white; padding:20px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.05); }
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:15px; margin-bottom:20px; }
+        .panel { border:1px solid #e2e8f0; border-radius:6px; padding:12px; background:var(--bg); }
+        .panel-title { font-size:11px; font-weight:bold; color:var(--purple); text-transform:uppercase; margin-bottom:10px; border-bottom:1px solid #e2e8f0; padding-bottom:4px; }
+        .form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:8px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size:11px; margin-bottom:3px; color:#64748b; }
+        input, select { padding:6px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px; }
+        .toolbar { display: flex; gap:10px; margin-bottom:15px; }
+        .btn { padding:8px 16px; border-radius:4px; border:1px solid #cbd5e1; background:white; cursor:pointer; font-weight:500; }
+        .btn-primary { background:var(--primary); color:white; border-color:var(--primary); }
+        .workspace { display: grid; grid-template-columns: 3fr 1fr; gap:20px; }
+        .canvas-area { border:1px solid #e2e8f0; border-radius:8px; padding:20px; background:#ffffff; position:relative; }
+        canvas { width: 100%; height: auto; background: #fff; border: 1px dashed #cbd5e1; }
+        .summary-panel { border:1px solid #e2e8f0; border-radius:8px; padding:15px; background:white; display:flex; flex-direction:column; justify-content:space-between; }
+        .summary-title { font-weight:bold; margin-bottom:15px; font-size:14px; }
+        .summary-item { display:flex; justify-content:between; padding:8px 0; border-bottom:1px dashed #f1f5f9; }
+        .summary-item span.val { font-weight:bold; margin-left:auto; }
+        .btn-export { background:var(--purple); color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%; }
+        .data-table { width:100%; border-collapse:collapse; margin-top:20px; text-align:center; }
+        .data-table th, .data-table td { border:1px solid #e2e8f0; padding:8px; }
+        .data-table th { background:#f8fafc; }
+        @media print { .no-print { display:none!important; } .workspace { grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
@@ -243,20 +37,11 @@
     <div class="settings-grid no-print">
         <div class="panel">
             <div class="panel-title">1. Text / File Input</div>
-            <div class="tab-group">
-                <button class="tab-btn active">Text</button>
-                <button class="tab-btn">Upload SVG/DXF</button>
-                <button class="tab-btn">Corel (CDR)</button>
-            </div>
             <input type="text" id="inputText" value="ABHISHEK" style="width:100%; margin-bottom:8px;">
             <div class="form-row">
-                <div class="form-group" style="grid-column: span 2;">
-                    <label>Font Family</label>
-                    <select id="fontFamily"><option value="Arial Black">Arial Black (Bold Face)</option></select>
-                </div>
-                <div class="form-group">
-                    <label>Bold</label>
-                    <select id="fontWeight"><option>Heavy</option></select>
+                <div class="form-group" style="grid-column: span 3;">
+                    <label>Font Engine</label>
+                    <select id="fontFamily"><option>Cloudflare Vector Engine (Roboto Black)</option></select>
                 </div>
             </div>
         </div>
@@ -268,61 +53,38 @@
                 <div class="form-group"><label>Depth (mm)</label><input type="number" value="60"></div>
                 <div class="form-group"><label>Stroke (in)</label><input type="number" value="2"></div>
             </div>
-            <div class="form-row" style="grid-template-columns: 2fr 1fr;">
-                <div class="form-group"><label>Front Type</label><select><option>Acrylic Front Lit</option></select></div>
-                <div class="form-group"><label>Spacing (%)</label><select><option>0</option></select></div>
-            </div>
         </div>
 
         <div class="panel">
             <div class="panel-title">3. LED Module Settings</div>
             <div class="form-row">
-                <div class="form-group"><label>LED Brand</label><select><option>Interone</option></select></div>
-                <div class="form-group"><label>Module</label><select><option>Z3U-V05 (3 LED)</option></select></div>
-                <div class="form-group"><label>Power</label><select id="ledPower"><option value="1.2">1.2W</option></select></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Beam Angle</label><select><option>170°</option></select></div>
-                <div class="form-group"><label>IP Rating</label><select><option>IP68</option></select></div>
-                <div class="form-group"><label>Color</label><select><option>White</option></select></div>
+                <div class="form-group"><label>Brand</label><select><option>Interone</option></select></div>
+                <div class="form-group"><label>Power</label><select><option>1.2W</option></select></div>
+                <div class="form-group"><label>Voltage</label><select><option>12V</option></select></div>
             </div>
         </div>
 
         <div class="panel">
             <div class="panel-title">4. LED Layout Settings</div>
             <div class="form-row">
-                <div class="form-group"><label>LED to LED (in)</label><input type="text" id="ledDistance" value="1.25"></div>
-                <div class="form-group"><label>Side Distance</label><input type="text" value="1"></div>
-                <div class="form-group"><label>Rows (Auto)</label><input type="number" value="2"></div>
-            </div>
-            <div class="form-row" style="grid-template-columns: 1fr 2fr;">
-                <div class="form-group"><label>Edge Margin</label><input type="text" value="0.75"></div>
-                <div class="form-group"><label>Start Point</label><select><option>Top Left</option></select></div>
+                <div class="form-group"><label>LED Spacing(in)</label><input type="text" id="ledSpacing" value="1.25"></div>
+                <div class="form-group"><label>Side Dist.</label><input type="text" value="1"></div>
+                <div class="form-group"><label>Rows</label><input type="number" value="2"></div>
             </div>
         </div>
     </div>
 
     <div class="toolbar no-print">
-        <button class="btn btn-primary" onclick="generateAccurateLayout()">▶ Generate Layout</button>
-        <button class="btn">⟳ Clear</button>
-        <button class="btn">📦 View 3D</button>
-        <button class="btn">⚡ Show Wiring</button>
-        <div style="flex-grow: 1;"></div>
-        <button class="btn">🔳 Zoom Fit</button>
-        <button class="btn">🔍 Zoom +</button>
-        <button class="btn">🔍 Zoom -</button>
+        <button class="btn btn-primary" onclick="getBackendLayout()">▶ Generate Layout (Backend Core)</button>
+        <button class="btn" onclick="window.print()">💾 Export PDF Report</button>
     </div>
 
     <div class="workspace">
         <div>
             <div class="canvas-area">
-                <div style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); font-weight: bold;" id="canvasHeightLabel">12 in</div>
-                <div class="canvas-container">
-                    <canvas id="layoutCanvas" width="900" height="220"></canvas>
-                </div>
+                <canvas id="layoutCanvas" width="950" height="220"></canvas>
             </div>
-
-            <div class="breakdown-container">
+            <div style="overflow-x:auto;">
                 <table class="data-table" id="matrixTable"></table>
             </div>
         </div>
@@ -333,132 +95,75 @@
                 <div class="summary-item"><span>⚙️ Total Modules</span><span class="val" id="sumModules">0 Nos</span></div>
                 <div class="summary-item"><span>⚡ Total Power</span><span class="val" id="sumPower">0 W</span></div>
                 <div class="summary-item"><span>🔌 Total Current</span><span class="val" id="sumCurrent">0 A</span></div>
-                <div class="summary-item"><span>🔲 Recommended SMPS</span><span class="val" id="sumSmps" style="color:#16a34a;">24V / 250W</span></div>
-                <div class="summary-item"><span>🪙 Total LED Cost</span><span class="val" id="sumLedCost">₹ 0.00</span></div>
-                <div class="summary-item"><span>📊 Est. Total Cost</span><span class="val" id="sumTotalCost">₹ 0.00</span></div>
+                <div class="summary-item"><span>🔲 Recommended SMPS</span><span class="val" id="sumSmps" style="color:green;">-</span></div>
             </div>
-            <button class="btn-export" onclick="window.print()">💾 Export PDF Report</button>
         </div>
     </div>
 </div>
 
 <script>
-function generateAccurateLayout() {
-    const textStr = document.getElementById('inputText').value.toUpperCase() || "ABHISHEK";
-    const heightIn = parseInt(document.getElementById('letterHeight').value) || 12;
-    const singleLedWatt = parseFloat(document.getElementById('ledPower').value) || 1.2;
-    
-    document.getElementById('canvasHeightLabel').innerText = heightIn + " in";
-    
+async function getBackendLayout() {
+    const text = document.getElementById('inputText').value || "ABHISHEK";
+    const heightIn = parseFloat(document.getElementById('letterHeight').value) || 12;
+    const ledSpacingIn = parseFloat(document.getElementById('ledSpacing').value) || 1.25;
+
     const canvas = document.getElementById('layoutCanvas');
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const letters = textStr.split('');
-    const totalLetters = letters.length || 1;
-    const segmentWidth = Math.floor((canvas.width - 60) / totalLetters);
+    try {
+        // बैकएंड क्लाउडफ्लेयर वर्कर API को हिट करना
+        const res = await fetch('/api/calculate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, heightIn, ledSpacingIn })
+        });
+        const data = await res.json();
 
-    let tableHeadHtml = '<tr><th>Letter</th>';
-    let tableModulesHtml = '<tr><td><strong>Modules</strong></td>';
-    let tablePowerHtml = '<tr><td><strong>Power (W)</strong></td>';
-    
-    let totalModulesCount = 0;
+        if(!data.success) { alert("Error calculating layout"); return; }
 
-    letters.forEach((char, idx) => {
-        let startX = 30 + (idx * segmentWidth);
-        let charModules = 0;
+        // समरी अपडेट करें
+        document.getElementById('sumModules').innerText = data.grandTotalLEDs + " Nos";
+        document.getElementById('sumPower').innerText = data.totalPower + " W";
+        document.getElementById('sumCurrent').innerText = data.totalAmps + " A";
+        document.getElementById('sumSmps').innerText = data.recommendedSmps;
 
-        // 1. बैकग्राउंड बफर पर अक्षर को ड्रा करें ताकि Boundary पहचानी जा सके
-        ctx.save();
-        ctx.font = "900 110px 'Arial Black', Impact, sans-serif";
-        ctx.fillStyle = "#e2e8f0";
-        ctx.strokeStyle = "#94a3b8";
-        ctx.lineWidth = 1.5;
-        
-        // अक्षर की बेसलाइन पोजीशन सेट करें
-        let charX = startX + (segmentWidth - ctx.measureText(char).width) / 2;
-        let charY = 140;
-        
-        ctx.fillText(char, charX, charY);
-        ctx.strokeText(char, charX, charY);
-        ctx.restore();
+        // टेबल रेंडरिंग
+        let th = '<tr><th>Metric</th>';
+        let trM = '<tr><td><strong>Modules</strong></td>';
+        let trP = '<tr><td><strong>Power (W)</strong></td>';
 
-        // 2. Bound Scanning & Accurate Matrix Dot Placement
-        // अक्षर के घेरे के अंदर ग्रिड सर्च चलाकर केवल अंदर के पॉइंट्स ढूंढना
-        let xMin = charX - 5;
-        let xMax = charX + ctx.measureText(char).width + 5;
-        let yMin = 40;
-        let yMax = 150;
+        // बैकएंड से मिले पॉइंट्स को कैनवास पर सटीक ड्रा करना
+        data.breakdown.forEach(item => {
+            th += `<th>${item.letter}</th>`;
+            trM += `<td>${item.ledCount}</td>`;
+            trP += `<td>${item.powerWatts}W</td>`;
 
-        // दो LEDs के बीच की पिक्सल दूरी (डेंसिटी कंट्रोल)
-        const densityStepX = 14; 
-        const densityStepY = 16; 
+            // हर एक LED पॉइंट को फिक्स पोजीशन पर ड्रा करना
+            item.ledPoints.forEach(pt => {
+                // मॉड्यूल बेस शेल
+                ctx.fillStyle = "#334155";
+                ctx.fillRect(pt.x - 4, pt.y - 6, 8, 12);
+                // क्रिस्टल कोर लेंस (रेड डॉट)
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 2, 0, 2 * Math.PI);
+                ctx.fillStyle = "#ff0000";
+                ctx.fill();
+            });
+        });
 
-        for (let gx = xMin; gx < xMax; gx += densityStepX) {
-            for (let gy = yMin; gy < yMax; gy += densityStepY) {
-                // Pixel Alpha Check: क्या यह पिक्सेल सचमुच अक्षर के अंदर पेंट हुआ है?
-                let pixelData = ctx.getImageData(gx, gy, 1, 1).data;
-                if (pixelData[3] > 0) { // If alpha channel is active (inside path)
-                    charModules++;
-                    
-                    // एलईडी मॉड्यूल ड्रा करें (छोटा बॉक्स और रेड डॉट सेंटर)
-                    ctx.fillStyle = "#334155";
-                    ctx.fillRect(gx - 4, gy - 6, 8, 12);
-                    
-                    ctx.beginPath();
-                    ctx.arc(gx, gy, 2, 0, 2 * Math.PI);
-                    ctx.fillStyle = "#ef4444"; // ब्राइट रेड एलईडी क्रिस्टल
-                    ctx.fill();
-                }
-            }
-        }
+        th += '<th>Total</th></tr>';
+        trM += `<td style="color:blue;font-weight:bold;">${data.grandTotalLEDs}</td></tr>`;
+        trP += `<td style="color:blue;font-weight:bold;">${data.totalPower}W</td></tr>`;
+        document.getElementById('matrixTable').innerHTML = th + trM + trP;
 
-        // सुरक्षा मार्जिन और रैंडम खालीपन को ठीक करने के लिए बेस फ़ॉलबैक वैल्यू
-        if(charModules === 0) charModules = 12; 
-        totalModulesCount += charModules;
-        
-        let currentLetterPower = parseFloat((charModules * singleLedWatt).toFixed(1));
-
-        // बॉटम टेबल रो बिल्डर
-        tableHeadHtml += `<th>${char}</th>`;
-        tableModulesHtml += `<td>${charModules}</td>`;
-        tablePowerHtml += `<td>${currentLetterPower}</td>`;
-
-        // अक्षर के नीचे उसकी पर्सनल एलईडी संख्या प्रिंट करें
-        ctx.fillStyle = "#0f172a";
-        ctx.font = "bold 13px Arial";
-        ctx.fillText(charModules, charX + (ctx.measureText(char).width/2) - 5, 195);
-    });
-
-    // समरी और कमर्शियल वैल्यूज कैलकुलेशन
-    const totalPowerCalculated = parseFloat((totalModulesCount * singleLedWatt).toFixed(1));
-    const totalAmps = parseFloat((totalPowerCalculated / 12).toFixed(2));
-    const ledCost = totalModulesCount * 30; 
-    const finalProjectCost = ledCost + 5260; 
-
-    // एसएमपीएस (SMPS) रिकमेंडेशन लॉजिक
-    let smpsBox = "12V / 100W";
-    if(totalPowerCalculated > 80) smpsBox = "12V / 200W";
-    if(totalPowerCalculated > 160) smpsBox = "12V / 250W";
-    if(totalPowerCalculated > 210) smpsBox = "12V / 350W";
-    if(totalPowerCalculated > 300) smpsBox = "12V / 400W";
-
-    // टेबल का टोटल कॉलम जोड़ें
-    tableHeadHtml += '<th class="total-highlight">Total</th></tr>';
-    tableModulesHtml += `<td class="total-highlight">${totalModulesCount}</td></tr>`;
-    tablePowerHtml += `<td class="total-highlight">${totalPowerCalculated}</td></tr>`;
-
-    // डेटा को DOM में पुश करें
-    document.getElementById('matrixTable').innerHTML = tableHeadHtml + tableModulesHtml + tablePowerHtml;
-    document.getElementById('sumModules').innerText = totalModulesCount + " Nos";
-    document.getElementById('sumPower').innerText = totalPowerCalculated + " W";
-    document.getElementById('sumCurrent').innerText = totalAmps + " A";
-    document.getElementById('sumSmps').innerText = smpsBox;
-    document.getElementById('sumLedCost').innerText = "₹ " + ledCost.toLocaleString('en-IN') + ".00";
-    document.getElementById('sumTotalCost').innerText = "₹ " + finalProjectCost.toLocaleString('en-IN') + ".00";
+    } catch(e) {
+        console.error(e);
+        alert("Backend Connection Failed. Make sure worker is deployed.");
+    }
 }
 
-window.onload = generateAccurateLayout;
+window.onload = getBackendLayout;
 </script>
 </body>
 </html>
