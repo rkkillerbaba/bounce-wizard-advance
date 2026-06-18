@@ -2,7 +2,7 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // 1. POST Request Handler (सटीक कैलकुलेशन और सिंक्रोनाइज्ड अलाइनमेंट)
+    // 1. POST Request Handler (कैलकुलेशन और फिक्स्ड मैपिंग कोर)
     if (request.method === "POST") {
       try {
         const data = await request.json().catch(() => ({ text: "ABHISHEK", heightIn: 12 }));
@@ -12,18 +12,18 @@ export default {
         
         const letters = text.toUpperCase().split('');
         
-        // हर अक्षर की LED को बिल्कुल सेंटर में फिक्स करने के लिए 100% परफेक्ट मैट्रिक्स मैप
+        // 100% सिंक की हुई प्रोपोर्शनल मैट्रिक्स ज्योमेट्री
         const vectorGlyphMaps = {
-          'A': [[15,130],[20,105],[25,80],[30,55],[35,30],[40,55],[45,80],[50,105],[55,130],[24,90],[34,90],[44,90]],
-          'B': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[28,30],[42,35],[50,50],[42,65],[28,65],[45,80],[52,100],[45,120],[28,130]],
+          'A': [[35,30],[31,50],[39,50],[27,70],[43,70],[23,90],[47,90],[19,110],[51,110],[15,130],[55,130],[25,95],[35,95],[45,95],[35,12]],
+          'B': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[25,30],[35,30],[45,35],[50,48],[45,60],[35,65],[25,65],[45,70],[52,85],[55,102],[50,118],[40,128],[25,130]],
           'H': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[55,30],[55,50],[55,70],[55,90],[55,110],[55,130],[25,80],[35,80],[45,80]],
           'I': [[35,30],[35,50],[35,70],[35,90],[35,110],[35,130],[20,30],[50,30],[20,130],[50,130]],
-          'S': [[50,40],[38,30],[22,42],[25,65],[38,75],[50,88],[45,115],[32,130],[18,115]],
-          'E': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[30,30],[45,30],[30,75],[42,75],[30,130],[45,130]],
-          'K': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[50,30],[42,50],[32,70],[22,85],[32,100],[42,115],[50,130]],
-          'R': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[28,30],[42,35],[48,52],[40,70],[26,70],[34,90],[42,110],[50,130]],
-          'O': [[35,30],[20,50],[20,90],[35,130],[50,110],[52,70],[50,40],[35,30]],
-          'G': [[50,40],[35,30],[20,60],[20,100],[35,130],[50,130],[50,90],[38,90]]
+          'S': [[48,40],[38,28],[24,36],[22,54],[32,66],[44,74],[50,88],[48,106],[38,122],[24,128],[15,114]],
+          'E': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[28,30],[42,30],[55,30],[28,75],[42,75],[28,130],[42,130],[55,130]],
+          'K': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[52,30],[44,48],[36,66],[28,84],[36,102],[44,120],[52,138]],
+          'R': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[28,30],[42,32],[50,48],[45,66],[28,68],[34,86],[42,104],[50,122],[56,136]],
+          'O': [[35,28],[22,46],[16,74],[18,104],[28,126],[44,126],[54,106],[56,76],[52,46],[38,28]],
+          'G': [[50,42],[38,28],[22,42],[16,74],[20,108],[34,128],[48,126],[52,102],[38,102]]
         };
 
         let currentXOffset = 40;
@@ -34,7 +34,7 @@ export default {
           const basePoints = vectorGlyphMaps[char] || vectorGlyphMaps['A'];
           let charLEDCount = basePoints.length;
           
-          // इमेज के स्टैंडर्ड काउंट के साथ सिंक्रोनाइज़ेशन
+          // ओरिजिनल इमेजेस के काउंट लोड को फिक्स रखना
           if (char === 'A') charLEDCount = 15;
           if (char === 'B') charLEDCount = 26;
           if (char === 'H') charLEDCount = 20;
@@ -46,14 +46,9 @@ export default {
           const dynamicPoints = [];
           for(let i = 0; i < charLEDCount; i++) {
               let pt = basePoints[i % basePoints.length];
-              
-              // बिल्कुल फिक्स्ड और अलाइन्ड स्केलिंग फ़ॉर्मूला
-              let calcX = currentXOffset + pt[0];
-              let calcY = 25 + pt[1];
-              
               dynamicPoints.push({
-                x: parseFloat(calcX.toFixed(1)),
-                y: parseFloat(calcY.toFixed(1))
+                x: parseFloat((currentXOffset + pt[0]).toFixed(1)),
+                y: parseFloat((35 + pt[1]).toFixed(1))
               });
           }
 
@@ -65,7 +60,7 @@ export default {
           });
 
           grandTotalLEDs += charLEDCount;
-          currentXOffset += 100; // हर अक्षर के लिए पर्याप्त स्पेसिंग ट्रैकर
+          currentXOffset += 110; // कैरेक्टर्स ओवरलैप न हों इसलिए परफेक्ट स्पेसिंग ब्लॉक
         });
 
         const totalPower = parseFloat((grandTotalLEDs * singleLedWatt).toFixed(1));
@@ -133,7 +128,7 @@ function getFrontendHTML() {
           .summary-title { font-weight:bold; margin-bottom:15px; font-size:14px; color: #1e293b; }
           .summary-item { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed #f1f5f9; font-size:13px; }
           .summary-item span.val { font-weight:bold; color: #0f172a; }
-          .btn-export { background:var(--purple); color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%; margin-top: 15px; }
+          .btn-export { background:var(--purple); color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor: pointer; width:100%; margin-top: 15px; }
           .data-table { width:100%; border-collapse:collapse; margin-top:20px; text-align:center; }
           .data-table th, .data-table td { border:1px solid #e2e8f0; padding:8px; }
           .data-table th { background:#f8fafc; font-weight:600; }
@@ -151,7 +146,7 @@ function getFrontendHTML() {
               <div class="form-row">
                   <div class="form-group" style="grid-column: span 3;">
                       <label>Font Engine</label>
-                      <select id="fontFamily"><option>Cloudflare Core Routing Engine</option></select>
+                      <select id="fontFamily"><option>Cloudflare Synchronized Vector Engine</option></select>
                   </div>
               </div>
           </div>
@@ -246,7 +241,7 @@ function getFrontendHTML() {
           let trM = '<tr><td><strong>Modules</strong></td>';
           let trP = '<tr><td><strong>Power (W)</strong></td>';
 
-          let offsetTracker = 40;
+          let letterCenterOffset = 40;
           
           for (let idx = 0; idx < data.breakdown.length; idx++) {
               let item = data.breakdown[idx];
@@ -254,17 +249,32 @@ function getFrontendHTML() {
               trM += '<td>' + item.ledCount + '</td>';
               trP += '<td>' + item.powerWatts + 'W</td>';
 
-              // एरर फिक्स गाइड: अक्षर की रेंडरिंग को पूरी तरह LED बाउंड्री बॉक्स के सापेक्ष सेंटर अलाइन करना
-              ctx.save();
-              ctx.font = "900 110px 'Arial Black', Impact, sans-serif";
-              ctx.fillStyle = "#ffffff";
-              ctx.strokeStyle = "#cbd5e1";
-              ctx.lineWidth = 1.5;
-              
-              // प्रत्येक कैरेक्टर की पोजीशन को फिक्स ऑफसेट पर सिंक किया गया है
-              let textXPos = offsetTracker + 5;
-              ctx.strokeText(item.letter, textXPos, 145);
-              ctx.restore();
+              // 100% परफेक्ट सिंकिंग: LED पॉइंट्स के आधार पर ही बैकग्राउंड बॉक्स ट्रेस बनाना
+              if (item.ledPoints.length > 0) {
+                  let xCoords = item.ledPoints.map(p => p.x);
+                  let yCoords = item.ledPoints.map(p => p.y);
+                  
+                  let minX = Math.min(...xCoords) - 12;
+                  let maxX = Math.max(...xCoords) + 12;
+                  let minY = Math.min(...yCoords) - 10;
+                  let maxY = Math.max(...yCoords) + 10;
+                  let midX = (minX + maxX) / 2;
+
+                  ctx.save();
+                  ctx.strokeStyle = "#cbd5e1";
+                  ctx.lineWidth = 1.5;
+                  ctx.setLineDash([4, 4]);
+                  
+                  // अक्षर की बाउंड्री गाइडलाइन बॉक्स
+                  ctx.strokeRect(minX, minY, (maxX - minX), (maxY - minY));
+                  
+                  // बॉक्स के ठीक बीचों-बीच धुंधला सा असली अक्षर ड्रा करना ताकि वह LEDs के बिल्कुल नीचे रहे
+                  ctx.font = "900 100px Arial, sans-serif";
+                  ctx.fillStyle = "rgba(226, 232, 240, 0.4)";
+                  ctx.textAlign = "center";
+                  ctx.fillText(item.letter, midX, maxY - 12);
+                  ctx.restore();
+              }
 
               // प्रत्येक फिक्स्ड LED पॉइंट को ड्रा करना
               for (let pIdx = 0; pIdx < item.ledPoints.length; pIdx++) {
@@ -277,12 +287,14 @@ function getFrontendHTML() {
                   ctx.fill();
               }
 
-              // सबटेक्स्ट डिजिटल काउंट अलाइनमेंट
+              // डिजिटल काउंट सबटेक्स्ट पोजीशन फिक्सिंग
+              let currentLetterXCoords = item.ledPoints.map(p => p.x);
+              let letterMidX = (Math.min(...currentLetterXCoords) + Math.max(...currentLetterXCoords)) / 2;
+
               ctx.fillStyle = "#475569";
               ctx.font = "bold 13px Arial";
-              ctx.fillText(item.ledCount, offsetTracker + 28, 205);
-              
-              offsetTracker += 100; // स्पेसिंग को ग्रिड के साथ सिंक्रोनाइज कर दिया गया है
+              ctx.textAlign = "center";
+              ctx.fillText(item.ledCount, letterMidX, 205);
           }
 
           th += '<th class="total-highlight">Total</th></tr>';
