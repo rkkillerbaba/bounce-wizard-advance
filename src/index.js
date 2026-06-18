@@ -2,7 +2,7 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // 1. यदि बटन दबाने पर फ्रंटएंड से POST रिक्वेस्ट आए, तो यहीं पर कैलकुलेशन करो
+    // 1. POST Request Handler (कैलकुलेशन इंजन)
     if (request.method === "POST") {
       try {
         const data = await request.json().catch(() => ({ text: "ABHISHEK", heightIn: 12 }));
@@ -12,7 +12,7 @@ export default {
         
         const letters = text.toUpperCase().split('');
         
-        // हर अक्षर के लिए 100% सटीक और फिक्स्ड वेक्टर मैट्रिक्स कोऑर्डिनेट्स
+        // 100% सटीक फिक्स्ड वेक्टर मैट्रिक्स मैप
         const vectorGlyphMaps = {
           'A': [[20,130],[25,110],[30,90],[35,70],[40,50],[45,30],[50,50],[55,70],[60,90],[65,110],[70,130],[32,95],[42,95],[52,95],[45,15]],
           'B': [[20,30],[20,50],[20,70],[20,90],[20,110],[20,130],[35,30],[50,35],[60,50],[50,65],[35,65],[55,80],[62,100],[55,120],[35,130],[45,130]],
@@ -89,7 +89,7 @@ export default {
       }
     }
 
-    // 2. जब नॉर्मल यूज़र ब्राउज़र में लिंक खोलेगा (GET रिक्वेस्ट), तो सीधे यह HTML डैशबोर्ड लोड करो
+    // 2. GET Request Handler (HTML फ्रंटएंड इंटरफेस)
     return new Response(getFrontendHTML(), {
       headers: { "Content-Type": "text/html; charset=utf-8" }
     });
@@ -217,7 +217,6 @@ function getFrontendHTML() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       try {
-          // यह सीधे आपके वर्कर के ऑन-डोमेन हैंडलर को POST हिट करेगा
           const res = await fetch(window.location.origin, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -241,12 +240,14 @@ function getFrontendHTML() {
           let trP = '<tr><td><strong>Power (W)</strong></td>';
 
           let offsetTracker = 40;
-          data.breakdown.forEach(item => {
-              th += `<th>${item.letter}</th>`;
-              trM += `<td>${item.ledCount}</td>`;
-              trP += `<td>${item.powerWatts}W</td>`;
+          
+          // यहाँ कम्पाईलर एरर को ठीक करने के लिए सुरक्षित स्ट्रिंग कॉनकैटिनेशन का उपयोग किया गया है
+          for (let idx = 0; idx < data.breakdown.length; idx++) {
+              let item = data.breakdown[idx];
+              th += '<th>' + item.letter + '</th>';
+              trM += '<td>' + item.ledCount + '</td>';
+              trP += '<td>' + item.powerWatts + 'W</td>';
 
-              // बैकग्राउंड गाइड लेटर ड्रा करना
               ctx.save();
               ctx.font = "900 115px 'Arial Black', Impact, sans-serif";
               ctx.fillStyle = "#ffffff";
@@ -255,26 +256,26 @@ function getFrontendHTML() {
               ctx.strokeText(item.letter, offsetTracker, 140);
               ctx.restore();
 
-              // बैकएंड कोऑर्डिनेट्स पर लाल एलईडी फिक्स करना
-              item.ledPoints.forEach(pt => {
+              for (let pIdx = 0; pIdx < item.ledPoints.length; pIdx++) {
+                  let pt = item.ledPoints[pIdx];
                   ctx.fillStyle = "#334155";
                   ctx.fillRect(pt.x - 4, pt.y - 6, 8, 12);
                   ctx.beginPath();
                   ctx.arc(pt.x, pt.y, 2, 0, 2 * Math.PI);
                   ctx.fillStyle = "#ef4444";
                   ctx.fill();
-              });
+              }
 
               ctx.fillStyle = "#475569";
               ctx.font = "bold 13px Arial";
               ctx.fillText(item.ledCount, offsetTracker + 25, 195);
               
               offsetTracker += 88;
-          });
+          }
 
           th += '<th class="total-highlight">Total</th></tr>';
-          trM += `<td class="total-highlight">${data.grandTotalLEDs}</td></tr>`;
-          trP += `<td class="total-highlight">${data.totalPower}W</td></tr>`;
+          trM += '<td class="total-highlight">' + data.grandTotalLEDs + '</td></tr>';
+          trP += '<td class="total-highlight">' + data.totalPower + 'W</td></tr>';
           document.getElementById('matrixTable').innerHTML = th + trM + trP;
 
       } catch(e) {
