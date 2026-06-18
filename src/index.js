@@ -2,17 +2,17 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // 1. POST Request Handler (कैलकुलेशन और फिक्स्ड मैपिंग कोर)
+    // 1. POST Request Handler (डायनेमिक एलईडी स्पेसिफिकेशन्स के साथ कैलकुलेशन कोर)
     if (request.method === "POST") {
       try {
-        const data = await request.json().catch(() => ({ text: "ABHISHEK", heightIn: 12 }));
+        const data = await request.json().catch(() => ({ text: "ABHISHEK", heightIn: 12, moduleWatt: 1.2 }));
         const text = data.text || "ABHISHEK";
         const heightIn = parseFloat(data.heightIn) || 12;
-        const singleLedWatt = 1.2;
+        const singleLedWatt = parseFloat(data.moduleWatt) || 1.2; // फ्रंटएंड से चुनी गई असली वाट क्षमता
         
         const letters = text.toUpperCase().split('');
         
-        // 100% सिंक की हुई प्रोपोर्शनल मैट्रिक्स ज्योमेट्री
+        // 100% सिंक्रोनाइज्ड ज्योमेट्री मैप
         const vectorGlyphMaps = {
           'A': [[35,30],[31,50],[39,50],[27,70],[43,70],[23,90],[47,90],[19,110],[51,110],[15,130],[55,130],[25,95],[35,95],[45,95],[35,12]],
           'B': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[25,30],[35,30],[45,35],[50,48],[45,60],[35,65],[25,65],[45,70],[52,85],[55,102],[50,118],[40,128],[25,130]],
@@ -34,7 +34,6 @@ export default {
           const basePoints = vectorGlyphMaps[char] || vectorGlyphMaps['A'];
           let charLEDCount = basePoints.length;
           
-          // ओरिजिनल इमेजेस के काउंट लोड को फिक्स रखना
           if (char === 'A') charLEDCount = 15;
           if (char === 'B') charLEDCount = 26;
           if (char === 'H') charLEDCount = 20;
@@ -60,7 +59,7 @@ export default {
           });
 
           grandTotalLEDs += charLEDCount;
-          currentXOffset += 110; // कैरेक्टर्स ओवरलैप न हों इसलिए परफेक्ट स्पेसिंग ब्लॉक
+          currentXOffset += 110;
         });
 
         const totalPower = parseFloat((grandTotalLEDs * singleLedWatt).toFixed(1));
@@ -93,7 +92,7 @@ export default {
       }
     }
 
-    // 2. GET Request Handler (HTML फ्रंटएंड)
+    // 2. GET Request Handler (प्रोफेशनल UI विद एलईडी डेटाबेस)
     return new Response(getFrontendHTML(), {
       headers: { "Content-Type": "text/html; charset=utf-8" }
     });
@@ -106,7 +105,7 @@ function getFrontendHTML() {
   <html lang="en">
   <head>
       <meta charset="UTF-8">
-      <title>Advance LED Layout Wizard Pro</title>
+      <title>SaaS LED Layout Wizard Pro v3</title>
       <style>
           :root { --primary: #2563eb; --purple: #7c3aed; --bg: #f8fafc; --border: #cbd5e1; }
           body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f1f5f9; margin:0; padding:15px; font-size:13px; color: #334155; }
@@ -128,7 +127,6 @@ function getFrontendHTML() {
           .summary-title { font-weight:bold; margin-bottom:15px; font-size:14px; color: #1e293b; }
           .summary-item { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed #f1f5f9; font-size:13px; }
           .summary-item span.val { font-weight:bold; color: #0f172a; }
-          .btn-export { background:var(--purple); color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor: pointer; width:100%; margin-top: 15px; }
           .data-table { width:100%; border-collapse:collapse; margin-top:20px; text-align:center; }
           .data-table th, .data-table td { border:1px solid #e2e8f0; padding:8px; }
           .data-table th { background:#f8fafc; font-weight:600; }
@@ -163,18 +161,35 @@ function getFrontendHTML() {
           <div class="panel">
               <div class="panel-title">3. LED Module Settings</div>
               <div class="form-row">
-                  <div class="form-group"><label>Brand</label><select><option>Interone</option></select></div>
-                  <div class="form-group"><label>Power</label><select><option>1.2W</option></select></div>
-                  <div class="form-group"><label>Voltage</label><select><option>12V</option></select></div>
+                  <div class="form-group">
+                      <label>Brand</label>
+                      <select id="ledBrand" onchange="updateModuleDropdown()">
+                          <option value="Interone">Interone (Korea)</option>
+                          <option value="Samsung">Samsung GOQ</option>
+                          <option value="NCLed">NC LED (Korea)</option>
+                          <option value="Rishang">Rishang (Pro)</option>
+                      </select>
+                  </div>
+                  <div class="form-group" style="grid-column: span 2;">
+                      <label>Module Model</label>
+                      <select id="ledModule" onchange="applyModuleSpecs()"></select>
+                  </div>
+              </div>
+              <div class="form-row" style="margin-top: 5px; font-size: 11px; background: #fff; padding: 4px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                  <div style="grid-column: span 3; color: #7c3aed; font-weight: bold;" id="ledSizeLabel">Size: 66x15 mm</div>
               </div>
           </div>
 
           <div class="panel">
               <div class="panel-title">4. LED Layout Settings</div>
               <div class="form-row">
-                  <div class="form-group"><label>LED Spacing(in)</label><input type="text" value="1.25"></div>
-                  <div class="form-group"><label>Side Dist.</label><input type="text" value="1"></div>
-                  <div class="form-group"><label>Rows</label><input type="number" value="2"></div>
+                  <div class="form-group"><label>Power</label><input type="text" id="ledPowerDisplay" readonly style="background:#f1f5f9;"></div>
+                  <div class="form-group"><label>Voltage</label><input type="text" id="ledVoltageDisplay" readonly style="background:#f1f5f9;"></div>
+                  <div class="form-group"><label>IP Rating</label><input type="text" id="ledIpDisplay" readonly style="background:#f1f5f9;"></div>
+              </div>
+              <div class="form-row">
+                  <div class="form-group" style="grid-column: span 2;"><label>Beam Angle</label><input type="text" id="ledBeamDisplay" readonly style="background:#f1f5f9;"></div>
+                  <div class="form-group"><label>Rows</label><input type="number" value="2" readonly style="background:#f1f5f9;"></div>
               </div>
           </div>
       </div>
@@ -210,9 +225,62 @@ function getFrontendHTML() {
   </div>
 
   <script>
+  // प्रो-ग्रेड एलईडी मॉडल्स डेटाबेस (असली साइज़ और पैरामीटर्स के साथ)
+  const ledDatabase = {
+      Interone: [
+          { name: "Z3U-V05 (3 LED Pro)", watt: 1.2, volt: "12V DC", beam: "170° Lens", ip: "IP68", size: "66 x 15 mm" },
+          { name: "Z1U-A03 (1 LED Mini)", watt: 0.4, volt: "12V DC", beam: "160° Mini", ip: "IP68", size: "24 x 14 mm" },
+          { name: "Z4U-V07 (4 LED Square)", watt: 1.44, volt: "12V DC", beam: "160° Wide", ip: "IP68", size: "42 x 42 mm" }
+      ],
+      Samsung: [
+          { name: "GOQ Eco 3-LED Lens", watt: 0.72, volt: "12V DC", beam: "150° Flat", ip: "IP68", size: "66 x 11 mm" },
+          { name: "GOQ Hi-Power 3-LED", watt: 1.5, volt: "12V DC", beam: "160° Convex", ip: "IP68", size: "72 x 17 mm" }
+      ],
+      NCLed: [
+          { name: "NC Eco3S Standard", watt: 0.72, volt: "12V DC", beam: "160° Clear", ip: "IP68", size: "68 x 12 mm" },
+          { name: "NC Lens3S Premium", watt: 1.2, volt: "12V DC", beam: "170° Optic", ip: "IP68", size: "72 x 17 mm" }
+      ],
+      Rishang: [
+          { name: "Rishang High-Efficacy", watt: 1.0, volt: "12V DC", beam: "160° Bright", ip: "IP68", size: "60 x 12 mm" },
+          { name: "Rishang RGB Matrix 3LED", watt: 0.72, volt: "12V DC", beam: "120° Diffuse", ip: "IP67", size: "75 x 15 mm" }
+      ]
+  };
+
+  function updateModuleDropdown() {
+      const brand = document.getElementById("ledBrand").value;
+      const moduleSelect = document.getElementById("ledModule");
+      moduleSelect.innerHTML = "";
+      
+      ledDatabase[brand].forEach(mod => {
+          let opt = document.createElement("option");
+          opt.value = mod.watt;
+          opt.innerText = mod.name;
+          // कस्टम डेटा एट्रिब्यूट्स स्पेसिफिकेशन्स को होल्ड करने के लिए
+          opt.setAttribute("data-volt", mod.volt);
+          opt.setAttribute("data-beam", mod.beam);
+          opt.setAttribute("data-ip", mod.ip);
+          opt.setAttribute("data-size", mod.size);
+          moduleSelect.appendChild(opt);
+      });
+      applyModuleSpecs();
+  }
+
+  function applyModuleSpecs() {
+      const select = document.getElementById("ledModule");
+      const opt = select.options[select.selectedIndex];
+      if(!opt) return;
+
+      document.getElementById("ledPowerDisplay").value = opt.value + "W";
+      document.getElementById("ledVoltageDisplay").value = opt.getAttribute("data-volt");
+      document.getElementById("ledBeamDisplay").value = opt.getAttribute("data-beam");
+      document.getElementById("ledIpDisplay").value = opt.getAttribute("data-ip");
+      document.getElementById("ledSizeLabel").innerText = "Size: " + opt.getAttribute("data-size");
+  }
+
   async function executeLayoutCalculation() {
       const text = document.getElementById('inputText').value || "ABHISHEK";
       const heightIn = parseFloat(document.getElementById('letterHeight').value) || 12;
+      const currentModuleWatt = parseFloat(document.getElementById('ledModule').value) || 1.2;
 
       const canvas = document.getElementById('layoutCanvas');
       const ctx = canvas.getContext('2d');
@@ -222,7 +290,7 @@ function getFrontendHTML() {
           const res = await fetch(window.location.origin, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ text, heightIn })
+              body: JSON.stringify({ text, heightIn, moduleWatt: currentModuleWatt })
           });
           const data = await res.json();
 
@@ -240,8 +308,6 @@ function getFrontendHTML() {
           let th = '<tr><th>Metric</th>';
           let trM = '<tr><td><strong>Modules</strong></td>';
           let trP = '<tr><td><strong>Power (W)</strong></td>';
-
-          let letterCenterOffset = 40;
           
           for (let idx = 0; idx < data.breakdown.length; idx++) {
               let item = data.breakdown[idx];
@@ -249,7 +315,6 @@ function getFrontendHTML() {
               trM += '<td>' + item.ledCount + '</td>';
               trP += '<td>' + item.powerWatts + 'W</td>';
 
-              // 100% परफेक्ट सिंकिंग: LED पॉइंट्स के आधार पर ही बैकग्राउंड बॉक्स ट्रेस बनाना
               if (item.ledPoints.length > 0) {
                   let xCoords = item.ledPoints.map(p => p.x);
                   let yCoords = item.ledPoints.map(p => p.y);
@@ -264,11 +329,8 @@ function getFrontendHTML() {
                   ctx.strokeStyle = "#cbd5e1";
                   ctx.lineWidth = 1.5;
                   ctx.setLineDash([4, 4]);
-                  
-                  // अक्षर की बाउंड्री गाइडलाइन बॉक्स
                   ctx.strokeRect(minX, minY, (maxX - minX), (maxY - minY));
                   
-                  // बॉक्स के ठीक बीचों-बीच धुंधला सा असली अक्षर ड्रा करना ताकि वह LEDs के बिल्कुल नीचे रहे
                   ctx.font = "900 100px Arial, sans-serif";
                   ctx.fillStyle = "rgba(226, 232, 240, 0.4)";
                   ctx.textAlign = "center";
@@ -276,7 +338,6 @@ function getFrontendHTML() {
                   ctx.restore();
               }
 
-              // प्रत्येक फिक्स्ड LED पॉइंट को ड्रा करना
               for (let pIdx = 0; pIdx < item.ledPoints.length; pIdx++) {
                   let pt = item.ledPoints[pIdx];
                   ctx.fillStyle = "#334155";
@@ -287,7 +348,6 @@ function getFrontendHTML() {
                   ctx.fill();
               }
 
-              // डिजिटल काउंट सबटेक्स्ट पोजीशन फिक्सिंग
               let currentLetterXCoords = item.ledPoints.map(p => p.x);
               let letterMidX = (Math.min(...currentLetterXCoords) + Math.max(...currentLetterXCoords)) / 2;
 
@@ -307,7 +367,11 @@ function getFrontendHTML() {
           alert("Connection Error to Cloudflare Route Engine.");
       }
   }
-  window.onload = executeLayoutCalculation;
+
+  // पहली बार लोड होने पर ड्रॉपडाउन इनिशियलाइज़ करें
+  window.onload = function() {
+      updateModuleDropdown();
+  };
   </script>
   </body>
   </html>
