@@ -20,6 +20,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f1f5f9; margi
 .panel { border:1px solid #e2e8f0; border-radius:6px; padding:15px; background:var(--bg); }
 .panel-title { font-size:12px; font-weight:900; color:var(--purple); text-transform:uppercase; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:6px; }
 .form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:10px; }
+.form-row.double { grid-template-columns: 1fr 1fr; }
 .form-group { display: flex; flex-direction: column; }
 .form-group label { font-size:11px; margin-bottom:4px; color:#64748b; font-weight:700; }
 input, select { padding:8px; border:1px solid var(--border); border-radius:4px; font-size:12px; background: white; outline:none; }
@@ -66,7 +67,7 @@ body.dark-mode .total-highlight { background: #064e3b !important; color: #34d399
 <div class="panel">
 <div class="panel-title">1. Sign Details</div>
 <input type="text" id="inputText" value="RISHI" style="width:100%; margin-bottom:10px; font-weight:bold; letter-spacing:1px;">
-<div class="form-row" style="grid-template-columns: 1fr 1fr;">
+<div class="form-row double">
 <div class="form-group"><label>Height (in)</label><input type="number" id="letterHeight" value="12"></div>
 <div class="form-group"><label>Stroke Width (in)</label><input type="number" step="0.5" id="strokeWidth" value="2.0"></div>
 </div>
@@ -127,32 +128,32 @@ body.dark-mode .total-highlight { background: #064e3b !important; color: #34d399
 <script>
 let isGlowMode = false;
 const SKELETONS = {
-'A': [[[50,0], [20,100]], [[50,0], [80,100]], [[30,60], [70,60]]],
-'B': [[[20,0], [20,100]], [[20,0], [60,0], [75,10], [80,25], [75,40], [60,50], [20,50]], [[20,50], [65,50], [80,60], [85,75], [80,90], [65,100], [20,100]]],
-'C': [[[80,20], [60,0], [30,0], [10,25], [10,75], [30,100], [60,100], [80,80]]],
-'D': [[[20,0], [20,100]], [[20,0], [60,0], [80,25], [80,75], [60,100], [20,100]]],
-'E': [[[80,0], [20,0], [20,100], [80,100]], [[20,50], [70,50]]],
-'F': [[[80,0], [20,0], [20,100]], [[20,50], [70,50]]],
-'G': [[[80,20], [60,0], [30,0], [10,25], [10,75], [30,100], [60,100], [80,80], [80,50], [50,50]]],
+'A': [[[50,0], [20,100]], [[50,0], [80,100]], [[30,65], [70,65]]],
+'B': [[[20,0], [20,100]], [[20,0], [55,0], [75,12], [75,38], [55,50], [20,50]], [[20,50], [60,50], [80,62], [80,88], [60,100], [20,100]]],
+'C': [[[80,20], [65,0], [35,0], [15,20], [15,80], [35,100], [65,100], [80,80]]],
+'D': [[[20,0], [20,100]], [[20,0], [55,0], [80,25], [80,75], [55,100], [20,100]]],
+'E': [[[80,0], [20,0], [20,100], [80,100]], [[20,50], [65,50]]],
+'F': [[[80,0], [20,0], [20,100]], [[20,50], [65,50]]],
+'G': [[[80,25], [65,0], [35,0], [15,25], [15,75], [35,100], [65,100], [80,75], [80,55], [50,55]]],
 'H': [[[20,0], [20,100]], [[80,0], [80,100]], [[20,50], [80,50]]],
-'I': [[[50,0], [50,100]], [[30,0], [70,0]], [[30,100], [70,100]]],
-'J': [[[70,0], [70,80], [50,100], [20,80], [20,60]]],
-'K': [[[20,0], [20,100]], [[80,0], [20,50]], [[35,40], [80,100]]],
+'I': [[[50,0], [50,100]], [[25,0], [75,0]], [[25,100], [75,100]]],
+'J': [[[70,0], [70,75], [45,100], [20,75], [20,55]]],
+'K': [[[20,0], [20,100]], [[80,0], [20,52]], [[38,40], [80,100]]],
 'L': [[[20,0], [20,100], [80,100]]],
-'M': [[[20,100], [20,0], [50,50], [80,0], [80,100]]],
+'M': [[[15,100], [15,0], [50,55], [85,0], [85,100]]],
 'N': [[[20,100], [20,0], [80,100], [80,0]]],
-'O': [[[50,0], [25,10], [10,35], [10,65], [25,90], [50,100], [75,90], [90,65], [90,35], [75,10], [50,0]]],
-'P': [[[20,100], [20,0], [60,0], [80,15], [80,35], [60,50], [20,50]]],
-'Q': [[[50,0], [25,10], [10,35], [10,65], [25,90], [50,100], [75,90], [90,65], [90,35], [75,10], [50,0]], [[60,70], [90,100]]],
-'R': [[[20,100], [20,0], [60,0], [80,15], [80,35], [60,50], [20,50]], [[50,50], [80,100]]],
-'S': [[[80,20], [65,0], [35,0], [20,20], [25,40], [40,50], [60,60], [75,80], [60,100], [35,100], [20,80]]],
+'O': [[[50,0], [22,12], [15,40], [15,60], [22,88], [50,100], [78,88], [85,60], [85,40], [78,12], [50,0]]],
+'P': [[[20,100], [20,0], [55,0], [75,12], [75,38], [55,50], [20,50]]],
+'Q': [[[50,0], [22,12], [15,40], [15,60], [22,88], [50,100], [78,88], [85,60], [85,40], [78,12], [50,0]], [[60,70], [85,95]]],
+'R': [[[20,100], [20,0], [55,0], [75,12], [75,38], [55,50], [20,50]], [[45,50], [80,100]]],
+'S': [[[80,22], [62,0], [38,0], [20,18], [22,40], [50,52], [78,62], [80,82], [62,100], [38,100], [18,80]]],
 'T': [[[10,0], [90,0]], [[50,0], [50,100]]],
-'U': [[[20,0], [20,80], [40,100], [60,100], [80,80], [80,0]]],
-'V': [[[10,0], [50,100]], [[90,0], [50,100]]],
-'W': [[[10,0], [30,100], [50,60], [70,100], [90,0]]],
+'U': [[[20,0], [20,75], [40,100], [60,100], [80,75], [80,0]]],
+'V': [[[15,0], [50,100]], [[85,0], [50,100]]],
+'W': [[[10,0], [28,100], [50,45], [72,100], [90,0]]],
 'X': [[[20,0], [80,100]], [[80,0], [20,100]]],
-'Y': [[[10,0], [50,50]], [[90,0], [50,50]], [[50,50], [50,100]]],
-'Z': [[[10,0], [90,0], [10,100], [90,100]]]
+'Y': [[[15,0], [50,48]], [[85,0], [50,48]], [[50,48], [50,100]]],
+'Z': [[[15,0], [85,0], [15,100], [85,100]]]
 };
 function toggle3DGlow() {
 isGlowMode = !isGlowMode;
@@ -177,20 +178,24 @@ const singleLedWatt = parseFloat(document.getElementById('ledModule').value) || 
 document.getElementById('canvasHeightLabel').innerText = heightIn + " in";
 let calcRows = 1;
 if (rowsVal === 'Auto') {
-let availableWidth = strokeIn - (2 * edgeGapIn);
-if (availableWidth <= 0) calcRows = 1;
-else calcRows = Math.max(1, Math.floor(availableWidth / spacingIn) + 1);
+if (strokeIn <= 2.2) calcRows = 1;
+else if (strokeIn <= 4.2) calcRows = 2;
+else calcRows = 3;
 } else {
 calcRows = parseInt(rowsVal);
 }
 let offsetArrIn = [];
-if (calcRows === 1) offsetArrIn = [0];
-else {
+if (calcRows === 1) {
+offsetArrIn = [0];
+} else {
 let span = strokeIn - (2 * edgeGapIn);
-if (span < 0) span = 0;
+if (span <= 0) {
+offsetArrIn = [-0.1, 0.1];
+} else {
 let step = span / (calcRows - 1);
 for (let r = 0; r < calcRows; r++) {
 offsetArrIn.push(-span / 2 + r * step);
+}
 }
 }
 const PPI = 14;
@@ -205,56 +210,57 @@ let grandTotalLEDs = 0;
 let layoutData = [];
 for (let i = 0; i < text.length; i++) {
 let char = text[i];
-if(char === ' ') { currentX += heightIn * PPI * 0.5; continue; }
+if (char === ' ') {
+currentX += heightIn * PPI * 0.4;
+continue;
+}
 let segments = SKELETONS[char] || SKELETONS['A'];
 let rawPoints = [];
 let maxX = 0;
 segments.forEach(seg => {
 seg.forEach(p => { if (p[0] > maxX) maxX = p[0]; });
-let lengths = [];
-let totalLen = 0;
-let pxSeg = seg.map(p => ({ x: p[0]*scaleBase, y: p[1]*scaleBase }));
-for (let j = 0; j < pxSeg.length - 1; j++) {
-let l = Math.hypot(pxSeg[j+1].x - pxSeg[j].x, pxSeg[j+1].y - pxSeg[j].y);
-lengths.push(l);
-totalLen += l;
-}
-if (totalLen === 0) return;
-let numLEDs = Math.max(1, Math.floor(totalLen / spacingPx) + 1);
-let margin = (totalLen - (numLEDs - 1) * spacingPx) / 2;
-for (let k = 0; k < numLEDs; k++) {
-let targetD = margin + k * spacingPx;
-let curr = 0;
-let segIdx = 0;
-while (segIdx < lengths.length && curr + lengths[segIdx] < targetD - 0.001) {
-curr += lengths[segIdx];
-segIdx++;
-}
-if (segIdx >= lengths.length) segIdx = lengths.length - 1;
-let remain = targetD - curr;
-let ratio = lengths[segIdx] === 0 ? 0 : remain / lengths[segIdx];
-let lx = pxSeg[segIdx].x + ratio * (pxSeg[segIdx+1].x - pxSeg[segIdx].x);
-let ly = pxSeg[segIdx].y + ratio * (pxSeg[segIdx+1].y - pxSeg[segIdx].y);
-let angle = Math.atan2(pxSeg[segIdx+1].y - pxSeg[segIdx].y, pxSeg[segIdx+1].x - pxSeg[segIdx].x);
 offsetPxArr.forEach(offset => {
-let nx = Math.cos(angle - Math.PI/2);
-let ny = Math.sin(angle - Math.PI/2);
+let pxSeg = seg.map(p => ({ x: p[0] * scaleBase, y: p[1] * scaleBase }));
+for (let j = 0; j < pxSeg.length - 1; j++) {
+let x1 = pxSeg[j].x;
+let y1 = pxSeg[j].y;
+let x2 = pxSeg[j+1].x;
+let y2 = pxSeg[j+1].y;
+let dx = x2 - x1;
+let dy = y2 - y1;
+let len = Math.hypot(dx, dy);
+if (len === 0) continue;
+let nx = -dy / len;
+let ny = dx / len;
+let ox1 = x1 + nx * offset;
+let oy1 = y1 + ny * offset;
+let ox2 = x2 + nx * offset;
+let oy2 = y2 + ny * offset;
+let odx = ox2 - ox1;
+let ody = oy2 - oy1;
+let olen = Math.hypot(odx, ody);
+if (olen === 0) continue;
+let angle = Math.atan2(ody, odx);
+let numLEDs = Math.max(1, Math.round(olen / spacingPx) + 1);
+for (let s = 0; s < numLEDs; s++) {
+let ratio = s / (numLEDs - 1 || 1);
 rawPoints.push({
-x: currentX + lx + nx * offset,
-y: 60 + ly + ny * offset,
+x: currentX + ox1 + odx * ratio,
+y: 60 + oy1 + ody * ratio,
 angle: angle
 });
-});
 }
+}
+});
 });
 let cleanPoints = [];
 rawPoints.forEach(p1 => {
-let isDup = cleanPoints.some(p2 => Math.hypot(p2.x - p1.x, p2.y - p1.y) < spacingPx * 0.65);
-if(!isDup) cleanPoints.push(p1);
+let isDup = cleanPoints.some(p2 => Math.hypot(p2.x - p1.x, p2.y - p1.y) < spacingPx * 0.4);
+if (!isDup) cleanPoints.push(p1);
 });
 grandTotalLEDs += cleanPoints.length;
 layoutData.push({ letter: char, count: cleanPoints.length, segments: segments, points: cleanPoints, baseX: currentX });
-currentX += (maxX * scaleBase) + (heightIn * PPI * 0.3);
+currentX += (maxX * scaleBase) + (heightIn * PPI * 0.25);
 }
 canvas.width = currentX + 60;
 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -269,7 +275,7 @@ ctx.beginPath();
 seg.forEach((p, idx) => {
 let px = item.baseX + p[0] * scaleBase;
 let py = 60 + p[1] * scaleBase;
-if(idx === 0) ctx.moveTo(px, py);
+if (idx === 0) ctx.moveTo(px, py);
 else ctx.lineTo(px, py);
 });
 ctx.stroke();
@@ -324,5 +330,4 @@ window.onload = calculateVectorCAD;
 </script>
 </body>
 </html>
-`;
-}
+; } 
