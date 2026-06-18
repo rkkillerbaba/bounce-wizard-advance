@@ -2,64 +2,97 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // 1. POST Request Handler (डायनेमिक एलईडी स्पेसिफिकेशन्स के साथ कैलकुलेशन कोर)
+    // 1. POST Request Handler (100% असली डायनेमिक स्पेसिंग कैलकुलेटर इंजन)
     if (request.method === "POST") {
       try {
-        const data = await request.json().catch(() => ({ text: "ABHISHEK", heightIn: 12, moduleWatt: 1.2 }));
+        const data = await request.json().catch(() => ({}));
         const text = data.text || "ABHISHEK";
         const heightIn = parseFloat(data.heightIn) || 12;
-        const singleLedWatt = parseFloat(data.moduleWatt) || 1.2; // फ्रंटएंड से चुनी गई असली वाट क्षमता
-        
+        const ledSpacingIn = parseFloat(data.ledSpacingIn) || 1.25; // एलईडी से एलईडी की दूरी
+        const sideDistIn = parseFloat(data.sideDistIn) || 1.0;     // साइड की दूरी
+        const rowsCount = parseInt(data.rowsCount) || 2;           // कतारों (Rows) की संख्या
+        const singleLedWatt = parseFloat(data.moduleWatt) || 1.2;
+
         const letters = text.toUpperCase().split('');
         
-        // 100% सिंक्रोनाइज्ड ज्योमेट्री मैप
-        const vectorGlyphMaps = {
-          'A': [[35,30],[31,50],[39,50],[27,70],[43,70],[23,90],[47,90],[19,110],[51,110],[15,130],[55,130],[25,95],[35,95],[45,95],[35,12]],
-          'B': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[25,30],[35,30],[45,35],[50,48],[45,60],[35,65],[25,65],[45,70],[52,85],[55,102],[50,118],[40,128],[25,130]],
-          'H': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[55,30],[55,50],[55,70],[55,90],[55,110],[55,130],[25,80],[35,80],[45,80]],
-          'I': [[35,30],[35,50],[35,70],[35,90],[35,110],[35,130],[20,30],[50,30],[20,130],[50,130]],
-          'S': [[48,40],[38,28],[24,36],[22,54],[32,66],[44,74],[50,88],[48,106],[38,122],[24,128],[15,114]],
-          'E': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[28,30],[42,30],[55,30],[28,75],[42,75],[28,130],[42,130],[55,130]],
-          'K': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[52,30],[44,48],[36,66],[28,84],[36,102],[44,120],[52,138]],
-          'R': [[15,30],[15,50],[15,70],[15,90],[15,110],[15,130],[28,30],[42,32],[50,48],[45,66],[28,68],[34,86],[42,104],[50,122],[56,136]],
-          'O': [[35,28],[22,46],[16,74],[18,104],[28,126],[44,126],[54,106],[56,76],[52,46],[38,28]],
-          'G': [[50,42],[38,28],[22,42],[16,74],[20,108],[34,128],[48,126],[52,102],[38,102]]
+        // अक्षरों का गणितीय वेक्टर स्केलेटन ढांचा (Scale 0-100)
+        // इसके आधार पर स्पेसिंग और हाइट की असली गणना की जाती है
+        const glyphSkeletons = {
+          'A': [[[30,15], [5,130]], [[30,15], [55,130]], [[18,90], [42,90]]],
+          'B': [[[15,25], [15,130]], [[15,25], [45,25], [52,48], [42,70], [15,70]], [[15,70], [45,70], [55,95], [45,130], [15,130]]],
+          'H': [[[15,25], [15,130]], [[55,25], [55,130]], [[15,75], [55,75]]],
+          'I': [[[35,25], [35,130]], [[15,25], [55,25]], [[15,130], [55,130]]],
+          'S': [[[50,35], [35,25], [15,40], [25,65], [48,80], [52,105], [35,130], [15,115]]],
+          'E': [[[15,25], [15,130]], [[15,25], [50,25]], [[15,75], [42,75]], [[15,130], [50,130]]],
+          'K': [[[15,25], [15,130]], [[50,25], [18,75]], [[18,75], [52,130]]],
+          'R': [[[15,25], [15,130]], [[15,25], [45,25], [52,48], [42,70], [15,70]], [[25,70], [52,130]]],
+          'O': [[[35,25], [15,50], [15,105], [35,130], [55,105], [55,50], [35,25]]],
+          'G': [[[50,45], [35,25], [15,50], [15,105], [35,130], [50,130], [50,85], [35,85]]]
         };
 
         let currentXOffset = 40;
         const breakdown = [];
         let grandTotalLEDs = 0;
 
-        letters.forEach((char) => {
-          const basePoints = vectorGlyphMaps[char] || vectorGlyphMaps['A'];
-          let charLEDCount = basePoints.length;
-          
-          if (char === 'A') charLEDCount = 15;
-          if (char === 'B') charLEDCount = 26;
-          if (char === 'H') charLEDCount = 20;
-          if (char === 'I') charLEDCount = 10;
-          if (char === 'S') charLEDCount = 22;
-          if (char === 'E') charLEDCount = 23;
-          if (char === 'K') charLEDCount = 13;
+        // पिक्सल कन्वर्शन फैक्टर्स (1 इंच = लगभग 8 पिक्सल कैनवास पर स्केल के लिए)
+        const scaleY = (heightIn * 8) / 100;
+        const pixelSpacing = ledSpacingIn * 8; 
+        const pixelSideOffset = sideDistIn * 4;
 
-          const dynamicPoints = [];
-          for(let i = 0; i < charLEDCount; i++) {
-              let pt = basePoints[i % basePoints.length];
-              dynamicPoints.push({
-                x: parseFloat((currentXOffset + pt[0]).toFixed(1)),
-                y: parseFloat((35 + pt[1]).toFixed(1))
-              });
+        letters.forEach((char) => {
+          const segments = glyphSkeletons[char] || glyphSkeletons['A'];
+          let generatedPoints = [];
+
+          // 1. कतारों (Rows) और साइड स्पेसिंग के आधार पर पाथ जनरेशन
+          for (let r = 0; r < rowsCount; r++) {
+            // यदि मल्टीपल रो हैं, तो उन्हें साइड डिस्टेंस के हिसाब से ऑफसेट (शिफ्ट) करना
+            let rowOffset = (r - (rowsCount - 1) / 2) * pixelSideOffset;
+
+            segments.forEach(stroke => {
+              for (let i = 0; i < stroke.length - 1; i++) {
+                let p1 = stroke[i];
+                let p2 = stroke[i+1];
+                
+                let x1 = currentXOffset + p1[0] + rowOffset;
+                let y1 = 20 + p1[1] * scaleY;
+                let x2 = currentXOffset + p2[0] + rowOffset;
+                let y2 = 20 + p2[1] * scaleY;
+
+                let dx = x2 - x1;
+                let dy = y2 - y1;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance === 0) continue;
+
+                // यूज़र के LED Spacing इनपुट के आधार पर सटीक डॉट्स फिक्स करना
+                let steps = Math.max(1, Math.floor(distance / pixelSpacing));
+                for (let s = 0; s <= steps; s++) {
+                  let t = s / steps;
+                  generatedPoints.push({
+                    x: parseFloat((x1 + dx * t).toFixed(1)),
+                    y: parseFloat((y1 + dy * t).toFixed(1))
+                  });
+                }
+              }
+            });
           }
+
+          // अत्यंत पास वाले डुप्लिकेट पॉइंट्स को हटाना
+          generatedPoints = generatedPoints.filter((p, idx, self) =>
+            self.findIndex(t => Math.hypot(t.x - p.x, t.y - p.y) < 3) === idx
+          );
+
+          const finalLedCount = generatedPoints.length || 10;
 
           breakdown.push({
             letter: char,
-            ledCount: charLEDCount,
-            powerWatts: parseFloat((charLEDCount * singleLedWatt).toFixed(1)),
-            ledPoints: dynamicPoints
+            ledCount: finalLedCount,
+            powerWatts: parseFloat((finalLedCount * singleLedWatt).toFixed(1)),
+            ledPoints: generatedPoints
           });
 
-          grandTotalLEDs += charLEDCount;
-          currentXOffset += 110;
+          grandTotalLEDs += finalLedCount;
+          currentXOffset += 110; 
         });
 
         const totalPower = parseFloat((grandTotalLEDs * singleLedWatt).toFixed(1));
@@ -92,7 +125,7 @@ export default {
       }
     }
 
-    // 2. GET Request Handler (प्रोफेशनल UI विद एलईडी डेटाबेस)
+    // 2. GET Request Handler (रिफ्रेश्ड फ्रंटएंड UI)
     return new Response(getFrontendHTML(), {
       headers: { "Content-Type": "text/html; charset=utf-8" }
     });
@@ -105,7 +138,7 @@ function getFrontendHTML() {
   <html lang="en">
   <head>
       <meta charset="UTF-8">
-      <title>SaaS LED Layout Wizard Pro v3</title>
+      <title>SaaS LED Layout Wizard Pro v4</title>
       <style>
           :root { --primary: #2563eb; --purple: #7c3aed; --bg: #f8fafc; --border: #cbd5e1; }
           body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f1f5f9; margin:0; padding:15px; font-size:13px; color: #334155; }
@@ -144,7 +177,7 @@ function getFrontendHTML() {
               <div class="form-row">
                   <div class="form-group" style="grid-column: span 3;">
                       <label>Font Engine</label>
-                      <select id="fontFamily"><option>Cloudflare Synchronized Vector Engine</option></select>
+                      <select id="fontFamily"><option>Intelligent Dynamic Vector Engine</option></select>
                   </div>
               </div>
           </div>
@@ -164,10 +197,10 @@ function getFrontendHTML() {
                   <div class="form-group">
                       <label>Brand</label>
                       <select id="ledBrand" onchange="updateModuleDropdown()">
-                          <option value="Interone">Interone (Korea)</option>
+                          <option value="Interone">Interone</option>
                           <option value="Samsung">Samsung GOQ</option>
-                          <option value="NCLed">NC LED (Korea)</option>
-                          <option value="Rishang">Rishang (Pro)</option>
+                          <option value="NCLed">NC LED</option>
+                          <option value="Rishang">Rishang</option>
                       </select>
                   </div>
                   <div class="form-group" style="grid-column: span 2;">
@@ -183,13 +216,14 @@ function getFrontendHTML() {
           <div class="panel">
               <div class="panel-title">4. LED Layout Settings</div>
               <div class="form-row">
-                  <div class="form-group"><label>Power</label><input type="text" id="ledPowerDisplay" readonly style="background:#f1f5f9;"></div>
-                  <div class="form-group"><label>Voltage</label><input type="text" id="ledVoltageDisplay" readonly style="background:#f1f5f9;"></div>
-                  <div class="form-group"><label>IP Rating</label><input type="text" id="ledIpDisplay" readonly style="background:#f1f5f9;"></div>
+                  <div class="form-group"><label>LED Spacing(in)</label><input type="number" step="0.05" id="ledSpacing" value="1.25"></div>
+                  <div class="form-group"><label>Side Dist.</label><input type="number" step="0.05" id="sideDist" value="1.00"></div>
+                  <div class="form-group"><label>Rows</label><input type="number" id="rowsCount" value="2" min="1" max="4"></div>
               </div>
-              <div class="form-row">
-                  <div class="form-group" style="grid-column: span 2;"><label>Beam Angle</label><input type="text" id="ledBeamDisplay" readonly style="background:#f1f5f9;"></div>
-                  <div class="form-group"><label>Rows</label><input type="number" value="2" readonly style="background:#f1f5f9;"></div>
+              <div class="form-row" style="margin-top:5px; font-size:11px;">
+                  <div class="form-group"><label>Volt</label><input type="text" id="ledVoltageDisplay" readonly style="background:#e2e8f0; border:none; padding:2px;"></div>
+                  <div class="form-group"><label>IP</label><input type="text" id="ledIpDisplay" readonly style="background:#e2e8f0; border:none; padding:2px;"></div>
+                  <div class="form-group"><label>Beam</label><input type="text" id="ledBeamDisplay" readonly style="background:#e2e8f0; border:none; padding:2px;"></div>
               </div>
           </div>
       </div>
@@ -203,7 +237,7 @@ function getFrontendHTML() {
           <div>
               <div class="canvas-area">
                   <div style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); font-weight: bold;" id="canvasHeightLabel">12 in</div>
-                  <canvas id="layoutCanvas" width="950" height="220"></canvas>
+                  <canvas id="layoutCanvas" width="950" height="240"></canvas>
               </div>
               <div style="overflow-x:auto;">
                   <table class="data-table" id="matrixTable"></table>
@@ -225,24 +259,21 @@ function getFrontendHTML() {
   </div>
 
   <script>
-  // प्रो-ग्रेड एलईडी मॉडल्स डेटाबेस (असली साइज़ और पैरामीटर्स के साथ)
   const ledDatabase = {
       Interone: [
-          { name: "Z3U-V05 (3 LED Pro)", watt: 1.2, volt: "12V DC", beam: "170° Lens", ip: "IP68", size: "66 x 15 mm" },
-          { name: "Z1U-A03 (1 LED Mini)", watt: 0.4, volt: "12V DC", beam: "160° Mini", ip: "IP68", size: "24 x 14 mm" },
-          { name: "Z4U-V07 (4 LED Square)", watt: 1.44, volt: "12V DC", beam: "160° Wide", ip: "IP68", size: "42 x 42 mm" }
+          { name: "Z3U-V05 (3 LED Pro)", watt: 1.2, volt: "12V DC", beam: "170°", ip: "IP68", size: "66 x 15 mm" },
+          { name: "Z1U-A03 (1 LED Mini)", watt: 0.4, volt: "12V DC", beam: "160°", ip: "IP68", size: "24 x 14 mm" }
       ],
       Samsung: [
-          { name: "GOQ Eco 3-LED Lens", watt: 0.72, volt: "12V DC", beam: "150° Flat", ip: "IP68", size: "66 x 11 mm" },
-          { name: "GOQ Hi-Power 3-LED", watt: 1.5, volt: "12V DC", beam: "160° Convex", ip: "IP68", size: "72 x 17 mm" }
+          { name: "GOQ Eco 3-LED Lens", watt: 0.72, volt: "12V DC", beam: "150°", ip: "IP68", size: "66 x 11 mm" },
+          { name: "GOQ Hi-Power 3-LED", watt: 1.5, volt: "12V DC", beam: "160°", ip: "IP68", size: "72 x 17 mm" }
       ],
       NCLed: [
-          { name: "NC Eco3S Standard", watt: 0.72, volt: "12V DC", beam: "160° Clear", ip: "IP68", size: "68 x 12 mm" },
-          { name: "NC Lens3S Premium", watt: 1.2, volt: "12V DC", beam: "170° Optic", ip: "IP68", size: "72 x 17 mm" }
+          { name: "NC Eco3S Standard", watt: 0.72, volt: "12V DC", beam: "160°", ip: "IP68", size: "68 x 12 mm" },
+          { name: "NC Lens3S Premium", watt: 1.2, volt: "12V DC", beam: "170°", ip: "IP68", size: "72 x 17 mm" }
       ],
       Rishang: [
-          { name: "Rishang High-Efficacy", watt: 1.0, volt: "12V DC", beam: "160° Bright", ip: "IP68", size: "60 x 12 mm" },
-          { name: "Rishang RGB Matrix 3LED", watt: 0.72, volt: "12V DC", beam: "120° Diffuse", ip: "IP67", size: "75 x 15 mm" }
+          { name: "Rishang High-Efficacy", watt: 1.0, volt: "12V DC", beam: "160°", ip: "IP68", size: "60 x 12 mm" }
       ]
   };
 
@@ -255,7 +286,6 @@ function getFrontendHTML() {
           let opt = document.createElement("option");
           opt.value = mod.watt;
           opt.innerText = mod.name;
-          // कस्टम डेटा एट्रिब्यूट्स स्पेसिफिकेशन्स को होल्ड करने के लिए
           opt.setAttribute("data-volt", mod.volt);
           opt.setAttribute("data-beam", mod.beam);
           opt.setAttribute("data-ip", mod.ip);
@@ -270,7 +300,6 @@ function getFrontendHTML() {
       const opt = select.options[select.selectedIndex];
       if(!opt) return;
 
-      document.getElementById("ledPowerDisplay").value = opt.value + "W";
       document.getElementById("ledVoltageDisplay").value = opt.getAttribute("data-volt");
       document.getElementById("ledBeamDisplay").value = opt.getAttribute("data-beam");
       document.getElementById("ledIpDisplay").value = opt.getAttribute("data-ip");
@@ -280,17 +309,30 @@ function getFrontendHTML() {
   async function executeLayoutCalculation() {
       const text = document.getElementById('inputText').value || "ABHISHEK";
       const heightIn = parseFloat(document.getElementById('letterHeight').value) || 12;
+      const ledSpacingIn = parseFloat(document.getElementById('ledSpacing').value) || 1.25;
+      const sideDistIn = parseFloat(document.getElementById('sideDist').value) || 1.0;
+      const rowsCount = parseInt(document.getElementById('rowsCount').value) || 2;
       const currentModuleWatt = parseFloat(document.getElementById('ledModule').value) || 1.2;
+
+      document.getElementById('canvasHeightLabel').innerText = heightIn + " in";
 
       const canvas = document.getElementById('layoutCanvas');
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       try {
+          // अब स्पेसिंग, साइड डिस्टेंस और रोज़ का डेटा सीधे बैकएंड पर जाएगा
           const res = await fetch(window.location.origin, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ text, heightIn, moduleWatt: currentModuleWatt })
+              body: JSON.stringify({ 
+                  text, 
+                  heightIn, 
+                  ledSpacingIn, 
+                  sideDistIn, 
+                  rowsCount, 
+                  moduleWatt: currentModuleWatt 
+              })
           });
           const data = await res.json();
 
@@ -319,25 +361,27 @@ function getFrontendHTML() {
                   let xCoords = item.ledPoints.map(p => p.x);
                   let yCoords = item.ledPoints.map(p => p.y);
                   
-                  let minX = Math.min(...xCoords) - 12;
-                  let maxX = Math.max(...xCoords) + 12;
+                  let minX = Math.min(...xCoords) - 10;
+                  let maxX = Math.max(...xCoords) + 10;
                   let minY = Math.min(...yCoords) - 10;
                   let maxY = Math.max(...yCoords) + 10;
                   let midX = (minX + maxX) / 2;
 
                   ctx.save();
                   ctx.strokeStyle = "#cbd5e1";
-                  ctx.lineWidth = 1.5;
-                  ctx.setLineDash([4, 4]);
+                  ctx.lineWidth = 1.2;
+                  ctx.setLineDash([3, 3]);
                   ctx.strokeRect(minX, minY, (maxX - minX), (maxY - minY));
                   
+                  // बैकग्राउंड वॉटरमार्क अक्षर को बॉक्स के सेंटर में सिंक करना
                   ctx.font = "900 100px Arial, sans-serif";
-                  ctx.fillStyle = "rgba(226, 232, 240, 0.4)";
+                  ctx.fillStyle = "rgba(226, 232, 240, 0.45)";
                   ctx.textAlign = "center";
-                  ctx.fillText(item.letter, midX, maxY - 12);
+                  ctx.fillText(item.letter, midX, maxY - 15);
                   ctx.restore();
               }
 
+              // प्रत्येक डायनेमिक LED पॉइंट रेंडर करना
               for (let pIdx = 0; pIdx < item.ledPoints.length; pIdx++) {
                   let pt = item.ledPoints[pIdx];
                   ctx.fillStyle = "#334155";
@@ -354,7 +398,7 @@ function getFrontendHTML() {
               ctx.fillStyle = "#475569";
               ctx.font = "bold 13px Arial";
               ctx.textAlign = "center";
-              ctx.fillText(item.ledCount, letterMidX, 205);
+              ctx.fillText(item.ledCount, letterMidX, 220);
           }
 
           th += '<th class="total-highlight">Total</th></tr>';
@@ -368,7 +412,6 @@ function getFrontendHTML() {
       }
   }
 
-  // पहली बार लोड होने पर ड्रॉपडाउन इनिशियलाइज़ करें
   window.onload = function() {
       updateModuleDropdown();
   };
